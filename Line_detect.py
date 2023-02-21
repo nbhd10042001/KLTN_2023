@@ -11,7 +11,7 @@ class LineDetector:
             slope, intercept = 0.001 ,0
 
         y1 = image.shape[0]
-        y2 = int(y1*(3/5)) #y1*(2/4)
+        y2 = int(y1*(7.3/10)) #y1*(2/4)
 
         x1 = int((y1 - intercept)/slope)
         x2 = int((y2 - intercept)/slope)
@@ -44,8 +44,8 @@ class LineDetector:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         canny = cv2.Canny(blur, 50, 150, apertureSize=3)
-        canny = cv2.dilate(canny, kernel, iterations=1)
-        canny = cv2.erode(canny, kernel, iterations=1)
+        # canny = cv2.dilate(canny, kernel, iterations=2)
+        # canny = cv2.erode(canny, kernel, iterations=1)
         return canny  
 
     def display_lines (self, image, lines):
@@ -65,8 +65,8 @@ class LineDetector:
         # print(height, width)
 
         arr = []
-        # arr.append([(0, height-100), (width, height-100), (600, 350)])
-        arr.append([(0, height-100),(0, height),(width, height), (width, height-100), (640, 430)])
+        arr.append([(0, height), (width, height), (600, 450)])
+        # arr.append([(0, height-100),(0, height),(width, height), (width, height-100), (640, 430)])
         # arr.append([(150, height), (width-150, height), (600, 500), (600, 500), (600, 500)])
 
         polygons = np.array(arr)

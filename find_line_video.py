@@ -5,10 +5,9 @@ from Line_detect import LineDetector
 # line detection
 ld = LineDetector()
 
-
 # cap = cv2.VideoCapture("video/road_car.mp4")
 # cap = cv2.VideoCapture("video/test2.mp4")
-cap = cv2.VideoCapture("video/car_light3.mp4")
+cap = cv2.VideoCapture("video/car_light6.mp4")
 # cap = cv2.VideoCapture("video/car_light1.mp4")
 
 while(cap.isOpened()):
