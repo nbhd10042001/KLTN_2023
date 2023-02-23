@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-class LineDetector:
+class LaneDetector:
     def make_coordinates(self, image, line_parameters):
         # slope, intercept = line_parameters
 

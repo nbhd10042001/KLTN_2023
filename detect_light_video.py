@@ -3,7 +3,7 @@ import numpy as np
 
 # video = cv2.VideoCapture("video\slow_traffic_small.mp4")
 # video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("./video/car_light5.mp4")
+video = cv2.VideoCapture("./video/car_light6.mp4")
 
 video.set(10, 0)
 video.set(11, 0)
@@ -72,8 +72,8 @@ while True:
     #     cv2.rectangle(frame, (x1 ,y1), (x1 + w1, y1 + h1), (0,255,0), 2)
         
     
-    cv2.imshow("mask_crop", mask)
-    cv2.imshow("bitw", bitw)
+    # cv2.imshow("mask_crop", mask)
+    # cv2.imshow("bitw", bitw)
     cv2.imshow("frame", frame)
 
     key = cv2.waitKey(1)

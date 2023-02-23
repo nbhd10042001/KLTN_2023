@@ -4,9 +4,8 @@ from Vehicle_detect import VehicleDetector
 import glob  
 import numpy as np
 
-
-video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("video\car_light1.mp4")
+# video = cv2.VideoCapture("video\car_light3_Trim.mp4")
+video = cv2.VideoCapture("video\light4.mp4")
 # video = cv2.VideoCapture(0)
 
 video.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -67,17 +66,16 @@ while True:
 
     # detect color lights------------------------------------------------------------------------------------------------
     hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
-
-    
     # find mask and threshold
-    lower = np.array([20, 140, 140])
-    upper = np.array([180, 255, 255])
+    lower = np.array([17, 40, 180])
+    upper = np.array([179, 255, 255])
 
     mask = cv2.inRange(hsv, lower, upper)
+    bitw = cv2.bitwise_and(frame, frame, mask=mask)
     kernel = np.ones((5, 5), np.uint8)
-    mask = cv2.erode(mask, kernel, iterations=1)
     mask = cv2.dilate(mask, kernel, iterations=5)
-
+    mask = cv2.erode(mask, kernel, iterations=2)
+    # mask = cv2.dilate(mask, kernel, iterations=8)
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # if find contours (True)
@@ -101,15 +99,12 @@ while True:
             elif (x + (2*w)/3) <= x1 <= (x + w) and (y) <= y1 <= (y + h):
                 cv2.putText(img_copy1, "Right", (x1, y1), 0, 1, (0, 255, 0), 1)
 
-
     cv2.imshow("img", img_copy1)
     # cv2.imshow("crop", crop_lights)
     cv2.imshow("mask_crop", mask)
 
-
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
-
 video.release()
 cv2.destroyAllWindows()

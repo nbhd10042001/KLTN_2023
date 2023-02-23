@@ -1,9 +1,9 @@
 import cv2 
 import numpy as np
-from Line_detect import LineDetector
+from Lane_detect import LaneDetector
 
 # line detection
-ld = LineDetector()
+ld = LaneDetector()
 
 cap = cv2.VideoCapture("video/road_car.mp4")
 # cap = cv2.VideoCapture("video/test2.mp4")

@@ -1,10 +1,10 @@
 import cv2
 import numpy as np
-from Line_detect import LineDetector
+from Lane_detect import LaneDetector
 from Vehicle_detect import VehicleDetector
 
 # line detection
-ld = LineDetector()
+ld = LaneDetector()
 # Load vehicle detector
 vd = VehicleDetector()
 

@@ -1,17 +1,14 @@
 import cv2
 from Vehicle_detect import VehicleDetector
 
-
 # Load vehicle detector
 vd = VehicleDetector()
 
-video = cv2.VideoCapture("video/slow_traffic_small.mp4")
+video = cv2.VideoCapture("video/test2.mp4")
 # video = cv2.VideoCapture(0)
-
 
 # Loop through the images
 while True:
-
     _, frame = video.read()
 
     vehicle_boxes = vd.detect_vehicles(frame)
