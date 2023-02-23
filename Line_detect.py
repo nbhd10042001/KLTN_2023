@@ -11,7 +11,7 @@ class LineDetector:
             slope, intercept = 0.001 ,0
 
         y1 = image.shape[0]
-        y2 = int(y1*(7.3/10)) #y1*(2/4)
+        y2 = int(y1*(6.7/10)) #y1*(2/4)
 
         x1 = int((y1 - intercept)/slope)
         x2 = int((y2 - intercept)/slope)
@@ -40,7 +40,6 @@ class LineDetector:
 
     def canny(self, image):
         kernel = np.ones((5,5), np.uint8)
-
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         canny = cv2.Canny(blur, 50, 150, apertureSize=3)
@@ -54,18 +53,17 @@ class LineDetector:
 
         if lines is not None:
             for x1, y1, x2, y2 in lines:
-                if 1500 > x1 > 0 and 1500 > y1 > 0 and 1500 > x2 > 0 and 1500 > y2 >0:
+                if (1200 > x1 > 0  and 1200 > x2 > 0) and (-300 < (x1 - x2) < 300):
                     cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 10)
         return line_image
 
-
+    # create mask polygons
     def region_of_interest(self, image):
         height = image.shape[0]
         width = image.shape[1]
-        # print(height, width)
 
         arr = []
-        arr.append([(0, height), (width, height), (600, 450)])
+        arr.append([(200, height), (width-150, height), (600, 450)])
         # arr.append([(0, height-100),(0, height),(width, height), (width, height-100), (640, 430)])
         # arr.append([(150, height), (width-150, height), (600, 500), (600, 500), (600, 500)])
 

@@ -12,6 +12,8 @@ def crop_vehicle(image, boxs):
     arr = []
     for i in range(len(boxs)):
         x, y, w, h = boxs[i]
+        x = x - 20; y = y - 20
+        w = w + 40; h = h + 40
         # add box to arr
         arr.append([(x, y), (x+w, y), (x+w, y+h), (x, y+h)])
     polygons = np.array(arr)
@@ -21,31 +23,33 @@ def crop_vehicle(image, boxs):
     return masked_image
 
 
-# cap = cv2.VideoCapture("video/road_car.mp4")
+cap = cv2.VideoCapture("video/road_car.mp4")
 # cap = cv2.VideoCapture("video/test2.mp4")
-cap = cv2.VideoCapture("video/car1.mp4")
+# cap = cv2.VideoCapture("video/car1.mp4")
+# cap = cv2.VideoCapture("video/car_light6.mp4")
 
 while(cap.isOpened()):
     _, frame = cap.read()
     frame = cv2.resize(frame, [1280, 720])
-    frame1 = frame.copy()
     frame2 = frame.copy()
 
     # detect vehicle-----------------------------------------------------------------------------------------------
-    vehicle_boxes = vd.detect_vehicles(frame1)
+    vehicle_boxes = vd.detect_vehicles(frame)
     # print (vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
-
-    for box in vehicle_boxes:
-        x, y, w, h = box
-
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
-        cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
 
 
     # detect lines ------------------------------------------------------------------------------------------------
     frame2 = crop_vehicle(frame2, vehicle_boxes)
     canny_image = ld.canny(frame2)
+    for box in vehicle_boxes:
+        x, y, w, h = box
+        x_ca = x - 20; y_ca = y - 20
+        w_ca = w + 40; h_ca = h + 40
+        cv2.rectangle(canny_image, (x_ca, y_ca), (x_ca + w_ca, y_ca + h_ca), (0,0,0), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
+        cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
+
     cropped_image = ld.region_of_interest(canny_image)
 
     #detection
@@ -61,8 +65,8 @@ while(cap.isOpened()):
         combo_image = frame.copy()
 
 
-    # cv2.imshow("frame2", frame2)
-    cv2.imshow("canny_image", cropped_image)
+    cv2.imshow("cropped_image", cropped_image)
+    # cv2.imshow("canny_image", canny_image)
     cv2.imshow("result", combo_image)
 
     key = cv2.waitKey(1)

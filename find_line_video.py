@@ -5,10 +5,9 @@ from Line_detect import LineDetector
 # line detection
 ld = LineDetector()
 
-# cap = cv2.VideoCapture("video/road_car.mp4")
+cap = cv2.VideoCapture("video/road_car.mp4")
 # cap = cv2.VideoCapture("video/test2.mp4")
-cap = cv2.VideoCapture("video/car_light6.mp4")
-# cap = cv2.VideoCapture("video/car_light1.mp4")
+# cap = cv2.VideoCapture("video/car_light6.mp4")
 
 while(cap.isOpened()):
     _, frame = cap.read()
@@ -17,7 +16,7 @@ while(cap.isOpened()):
     cropped_image = ld.region_of_interest(canny_image)
 
     #detection
-    lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=5)
+    lines = cv2.HoughLinesP(cropped_image, 1, np.pi/180, 50, np.array([]), minLineLength=20, maxLineGap=50)
     
     if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame, lines)
