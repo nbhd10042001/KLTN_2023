@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from Lane_detect import LaneDetector
-from Vehicle_detect import VehicleDetector
+from pythonDetect.Lane_detect import LaneDetector
+from pythonDetect.Vehicle_detect import VehicleDetector
 
 # line detection
 ld = LaneDetector()
@@ -22,14 +22,18 @@ def crop_vehicle(image, boxs):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
+video = "video/road_car.mp4"
+# video = "video/test2.mp4"
+# video = "video/car1.mp4"
+# video = "video/car_light6.mp4"
 
-cap = cv2.VideoCapture("video/road_car.mp4")
-# cap = cv2.VideoCapture("video/test2.mp4")
-# cap = cv2.VideoCapture("video/car1.mp4")
-# cap = cv2.VideoCapture("video/car_light6.mp4")
-
+cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
-    _, frame = cap.read()
+    ret, frame = cap.read()
+    if not ret:
+        cap = cv2.VideoCapture(video)
+        continue
+
     frame = cv2.resize(frame, [1280, 720])
     frame2 = frame.copy()
 
@@ -53,7 +57,7 @@ while(cap.isOpened()):
     cropped_image = ld.region_of_interest(canny_image)
 
     #detection
-    lines = cv2.HoughLinesP(cropped_image, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=5)
+    lines = cv2.HoughLinesP(cropped_image, 1, np.pi/180, 50, np.array([]), minLineLength=40, maxLineGap=50)
     
     if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame2, lines)

@@ -1,15 +1,19 @@
 import cv2
-from Vehicle_detect import VehicleDetector
+import time
+from pythonDetect.Vehicle_detect import VehicleDetector
+from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
+
 
 # Load vehicle detector
-vd = VehicleDetector()
+vd = VehicleDetector_yolov5()
 
-video = cv2.VideoCapture("video/test2.mp4")
-# video = cv2.VideoCapture(0)
+# video = cv2.VideoCapture("video/road_car.mp4")
+video = cv2.VideoCapture(0)
 
 # Loop through the images
 while True:
     _, frame = video.read()
+    start = time.time()
 
     vehicle_boxes = vd.detect_vehicles(frame)
     # print (vehicle_boxes)
@@ -26,6 +30,8 @@ while True:
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
-
+    
+    end = time.time()
+    print("frame/s:", end - start)
 video.release()
 cv2.destroyAllWindows()
