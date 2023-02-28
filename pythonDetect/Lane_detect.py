@@ -31,14 +31,14 @@ class LaneDetector:
         right_fit_average = np.average(right_fit, axis=0)
         left_line = abs(self.make_coordinates(image, left_fit_average))
         right_line = abs(self.make_coordinates(image, right_fit_average))
-            
+        
         return np.array([left_line, right_line])
 
     def canny(self, image):
         kernel = np.ones((5,5), np.uint8)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        canny = cv2.Canny(blur, 50, 150, apertureSize=3)
+        canny = cv2.Canny(blur, 100, 150, apertureSize=3)
         # canny = cv2.dilate(canny, kernel, iterations=1)
         # canny = cv2.erode(canny, kernel, iterations=1)
         return canny  
@@ -65,8 +65,7 @@ class LaneDetector:
         width = image.shape[1]
 
         arr = []
-        arr.append([(100, height), (600, 470), (700, 470), (width-100, height),
-                    (width-500, height), (620, 470), (500, height)])
+        arr.append([(100, height), (600, 470), (700, 470), (width-100, height)])
         # arr.append([(0, height-100),(0, height),(width, height), (width, height-100), (640, 430)])
         # arr.append([(150, height), (width-150, height), (600, 500), (600, 500), (600, 500)])
         polygons = np.array(arr)

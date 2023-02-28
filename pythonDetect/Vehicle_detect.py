@@ -5,7 +5,7 @@ class VehicleDetector:
 
     def __init__(self):
         #load network
-        net = cv2.dnn.readNet("model_dnn/yolov4.weights", "model_dnn/yolov4.cfg")
+        net = cv2.dnn.readNet("model_dnn/yolov3-tiny.weights", "model_dnn/yolov3-tiny.cfg")
         self.model = cv2.dnn_DetectionModel(net)
         self.model.setInputParams(size=(832, 832), scale = 1/255)
 
@@ -18,6 +18,7 @@ class VehicleDetector:
 
         #detect Objects
         vehicles_boxes = []
+        conf = []
         class_ids, scores, boxes = self.model.detect(img, nmsThreshold = 0.4)
         for class_id, score, box in zip(class_ids, scores, boxes):
             if score < 0.3:
@@ -26,5 +27,7 @@ class VehicleDetector:
 
             if class_id in self.classes_allowed:
                 vehicles_boxes.append(box)
+                conf.append(score)
 
-        return vehicles_boxes
+
+        return vehicles_boxes, conf

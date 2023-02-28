@@ -3,10 +3,11 @@ from pythonDetect.Vehicle_detect import VehicleDetector
 from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 import matplotlib.pyplot as plt
 import glob  
+import time
 
 
 # Load vehicle detector
-vd = VehicleDetector_yolov5()
+vd = VehicleDetector()
 
 # Load images from a folder
 images_folder = glob.glob("img/car/*.*") # muon tim cu the thi dung ("img/*.jpg")
@@ -16,6 +17,8 @@ images_folder = glob.glob("img/car/*.*") # muon tim cu the thi dung ("img/*.jpg"
 # Loop through the images
 for img_path in images_folder:
     # print("img_path:", img_path)
+    
+    start = time.time()
 
     img = cv2.imread(img_path)
     img = cv2.resize(img, [960, 640])
@@ -36,7 +39,8 @@ for img_path in images_folder:
         dis = ((h_i) / h)
         cv2.putText(img, "Dis: " + str(round(dis, 2)) + "m", (x, y), 0, 1, (255, 0, 0), 2)
 
- 
+    end = time.time()
+    print("frame/second: ", end - start)
     cv2.imshow("Car", img)
     cv2.waitKey(0)
 

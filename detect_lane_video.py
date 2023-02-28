@@ -5,10 +5,10 @@ from pythonDetect.Lane_detect import LaneDetector
 # line detection
 ld = LaneDetector()
 
-video = "video/road_car.mp4"
+# video = "video/road_car.mp4"
 # video = "video/test2.mp4"
 # video = "video/lane1.mp4"
-# video = "video/car_light6.mp4"
+video = "video/car_light6.mp4"
 
 cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
