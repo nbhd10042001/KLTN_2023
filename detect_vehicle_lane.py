@@ -13,8 +13,8 @@ vd = VehicleDetector_yolov5()
 
 def crop_vehicle(image, boxs):
     arr = []
-    for i in range(len(boxs)):
-        x, y, w, h = boxs[i]
+    for box in boxs:
+        x, y, w, h, _ = box
         x = x - 20; y = y - 20
         w = w + 40; h = h + 40
         # add box to arr
@@ -31,29 +31,32 @@ video = "video/car_light6.mp4"
 
 cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
+    start = time.time()
+
     ret, frame = cap.read()
     if not ret:
         cap = cv2.VideoCapture(video)
         continue
-    start = time.time()
     frame = cv2.resize(frame, [1280, 720])
     frame2 = frame.copy()
 
     # detect vehicle-----------------------------------------------------------------------------------------------
-    vehicle_boxes, conf = vd.detect_vehicles(frame)
+    vehicle_boxes, _ = vd.detect_vehicles(frame)
     # print (vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
 
     # detect lines ------------------------------------------------------------------------------------------------
     frame2 = crop_vehicle(frame2, vehicle_boxes)
     canny_image = ld.canny(frame2)
-    for box in vehicle_boxes:
-        x, y, w, h = box
-        x_ca = x - 20; y_ca = y - 20
-        w_ca = w + 40; h_ca = h + 40
-        cv2.rectangle(canny_image, (x_ca, y_ca), (x_ca + w_ca, y_ca + h_ca), (0,0,0), 2)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
-        cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
+    if vehicle_boxes:
+        for box in vehicle_boxes:
+            x, y, w, h, conf = box
+            x_ca = x - 20; y_ca = y - 20
+            w_ca = w + 40; h_ca = h + 40
+            cv2.rectangle(canny_image, (x_ca, y_ca), (x_ca + w_ca, y_ca + h_ca), (0,0,0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
+            cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
+            cv2.putText(frame, "{:.2f}".format(conf), (x, y), 0, 0.5, (0, 255, 0), 2)
 
     cropped_image = ld.region_of_interest(canny_image)
 

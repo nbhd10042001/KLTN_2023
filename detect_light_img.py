@@ -1,5 +1,6 @@
 import cv2 
-from pythonDetect.Vehicle_detect import VehicleDetector
+from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
+
 # import matplotlib.pyplot as plt
 import glob  
 import numpy as np
@@ -9,7 +10,7 @@ font = cv2.FONT_HERSHEY_COMPLEX
 def crop_lights_vehicle(image, boxs):
     arr = []
     for i in range(len(boxs)):
-        x, y, w, h = boxs[i]
+        x, y, w, h, cf = boxs[i]
         # add box to arr
         h2 = int(h/2)
         w13 = int(w/3)
@@ -26,7 +27,7 @@ def crop_lights_vehicle(image, boxs):
 
 
 # Load vehicle detector
-vd = VehicleDetector()
+vd = VehicleDetector_yolov5()
 
 #load img
 img = cv2.imread("img/car_lights/light_right.png")
@@ -34,7 +35,7 @@ img = cv2.resize(img, [960, 640])
 img_copy1 = img.copy()
 img_copy2 = img.copy()
 
-vehicle_boxes = vd.detect_vehicles(img_copy1)
+vehicle_boxes, _ = vd.detect_vehicles(img_copy1)
 # print (vehicle_boxes)
 vehicle_count = len(vehicle_boxes)
 crop_lights = crop_lights_vehicle(img_copy2, vehicle_boxes)
@@ -44,15 +45,11 @@ crop_lights = crop_lights_vehicle(img_copy2, vehicle_boxes)
 
 # detect vehicle ------------------------------------------------------------------------------------------------
 for box in vehicle_boxes:
-    x, y, w, h = box
+    x, y, w, h, cf = box
     # print(x, y, w, h)
     cv2.rectangle(img_copy1, (x, y), (x + w, y + h), (255,0,0), 2)
     cv2.putText(img_copy1, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
 
-    h_i = img_copy1.shape[0]
-    #calculate distance
-    dis = ((h_i) / h)
-    cv2.putText(img_copy1, "Dis: " + str(round(dis, 2)) + "m", (x, y), 0, 1, (255, 0, 0), 2)
 
 # detect color lights------------------------------------------------------------------------------------------------
 hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
@@ -80,13 +77,16 @@ if contours:
     x1, y1, w1, h1 = cv2.boundingRect(cnt)
     print(x1, y1, w1, h1)
     cv2.rectangle(img_copy1, (x1 ,y1), (x1 + w1, y1 + h1), (0,255,0), 2)
+    x_ct = int(x1 + (w1/2))
+    y_ct = int(y1 + (h1/2))
+    cv2.circle(img_copy1, (x_ct, y_ct), 5, (255,0,0), 3)
 
     # detect turn signal lights 
     for box in vehicle_boxes:
-        x, y, w, h = box
-        if x <= x1 <= (x + w/3) and (y) <= y1 <= (y + h):
+        x, y, w, h, cf = box
+        if x <= x_ct <= (x + w/3) and (y) <= y_ct <= (y + h):
             cv2.putText(img_copy1, "Left", (x1, y1), 0, 1, (255, 0, 0), 2)
-        elif (x + (2*w)/3) <= x1 <= (x + w) and (y) <= y1 <= (y + h):
+        elif (x + (2*w)/3) <= x_ct <= (x + w) and (y) <= y_ct <= (y + h):
             cv2.putText(img_copy1, "Right", (x1, y1), 0, 1, (255, 0, 0), 2)
 
 

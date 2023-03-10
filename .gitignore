@@ -2,3 +2,5 @@ model_dnn
 video
 pythonTest
 pythonTemp
+weights
+tracker.py

@@ -7,8 +7,8 @@ ld = LaneDetector()
 
 # video = "video/road_car.mp4"
 # video = "video/test2.mp4"
-# video = "video/lane1.mp4"
 video = "video/car_light6.mp4"
+# video = "video/lane1.mp4"
 
 cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
@@ -29,7 +29,7 @@ while(cap.isOpened()):
         # threshold
         # line_image = display_lines(lane_image, lines)
         line_image = ld.display_lines(frame, averaged_lines)
-        combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+        combo_image = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
     else:
         combo_image = frame.copy()
 

@@ -10,7 +10,7 @@ class LaneDetector:
             slope, intercept = 0.001 ,0
 
         y1 = image.shape[0]
-        y2 = int(y1*(6.8/10)) #y1*(2/4)
+        y2 = int(y1*(6.5/10)) #y1*(2/4)
         x1 = int((y1 - intercept)/slope)
         x2 = int((y2 - intercept)/slope)
         return np.array([x1, y1, x2, y2])
@@ -38,7 +38,7 @@ class LaneDetector:
         kernel = np.ones((5,5), np.uint8)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        canny = cv2.Canny(blur, 100, 150, apertureSize=3)
+        canny = cv2.Canny(blur, 50, 150, apertureSize=3)
         # canny = cv2.dilate(canny, kernel, iterations=1)
         # canny = cv2.erode(canny, kernel, iterations=1)
         return canny  
@@ -50,7 +50,7 @@ class LaneDetector:
         arr = []
         if lines is not None:
             for x1, y1, x2, y2 in lines:
-                if (1280 > x1 > 0  and 1280 > x2 > 0) and ((abs(x1) - abs(x2)) < 450):
+                if (1280 > x1 > 0  and 1280 > x2 > 0) and ((abs(x1) - abs(x2)) < 500):
                     arr.append([x1, y1])
                     arr.append([x2, y2])
             if len(arr) == 4 and arr[1][0] < arr[3][0]:
@@ -65,7 +65,7 @@ class LaneDetector:
         width = image.shape[1]
 
         arr = []
-        arr.append([(100, height), (600, 470), (700, 470), (width-100, height)])
+        arr.append([(0, height), (600, 470), (700, 470), (width, height)])
         # arr.append([(0, height-100),(0, height),(width, height), (width, height-100), (640, 430)])
         # arr.append([(150, height), (width-150, height), (600, 500), (600, 500), (600, 500)])
         polygons = np.array(arr)

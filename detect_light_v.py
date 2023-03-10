@@ -1,11 +1,12 @@
 import cv2 
-from pythonDetect.Vehicle_detect import VehicleDetector
+from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
+
 # import matplotlib.pyplot as plt
 import glob  
 import numpy as np
 
 # video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("video\light4.mp4")
+video = cv2.VideoCapture("video\car_light2.mp4")
 # video = cv2.VideoCapture(0)
 
 video.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -17,7 +18,7 @@ font = cv2.FONT_HERSHEY_COMPLEX
 def crop_lights_vehicle(image, boxs):
     arr = []
     for i in range(len(boxs)):
-        x, y, w, h = boxs[i]
+        x, y, w, h, cf = boxs[i]
         # add box to arr
         h2 = int(h/2)
         w13 = int(w/3)
@@ -34,17 +35,17 @@ def crop_lights_vehicle(image, boxs):
 
 
 # Load vehicle detector
-vd = VehicleDetector()
+vd = VehicleDetector_yolov5()
 
 while True:
     #load video
     _, frame = video.read(0)
-    frame = cv2.resize(frame, [1280, 720])
+    frame = cv2.resize(frame, [640, 480])
 
     img_copy1 = frame.copy()
     img_copy2 = frame.copy()
 
-    vehicle_boxes = vd.detect_vehicles(img_copy1)
+    vehicle_boxes, _ = vd.detect_vehicles(img_copy1)
     # print (vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
     crop_lights = crop_lights_vehicle(img_copy2, vehicle_boxes)
@@ -54,9 +55,9 @@ while True:
 
     # detect vehicle ------------------------------------------------------------------------------------------------
     for box in vehicle_boxes:
-        x, y, w, h = box
+        x, y, w, h, cf = box
         # print(x, y, w, h)
-        cv2.rectangle(img_copy1, (x, y), (x + w, y + h), (255,0,0), 1)
+        cv2.rectangle(img_copy1, (x, y), (x + w, y + h), (255,0,0), 2)
         cv2.putText(img_copy1, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 1)
 
         h_i = img_copy1.shape[0]
@@ -93,7 +94,7 @@ while True:
 
         # detect turn signal lights 
         for box in vehicle_boxes:
-            x, y, w, h = box
+            x, y, w, h, cf = box
             if x <= x1 <= (x + w/3) and (y) <= y1 <= (y + h):
                 cv2.putText(img_copy1, "Left", (x1, y1), 0, 1, (0, 255, 0), 1)
             elif (x + (2*w)/3) <= x1 <= (x + w) and (y) <= y1 <= (y + h):
