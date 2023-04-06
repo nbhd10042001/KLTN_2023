@@ -6,14 +6,15 @@ from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 # Load vehicle detector
 vd = VehicleDetector_yolov5()
 
-video = cv2.VideoCapture("video/car1.mp4")
+video = cv2.VideoCapture("video/car/car1.mp4")
+
 # video = cv2.VideoCapture(0)
 
 # Loop through the images
 while True:
     start = time.time()
     _, frame = video.read()
-    frame = cv2.resize(frame, [1280 ,720])
+    frame = cv2.resize(frame, [640 ,480])
 
     vehicle_boxes, cls_b = vd.detect_vehicles(frame)
 

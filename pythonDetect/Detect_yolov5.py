@@ -8,7 +8,7 @@ class VehicleDetector_yolov5:
         # weights_select  = input("select your weights: ")
         # model = torch.hub.load('','yolov5', 'weights\yolov5s', source='local')
         # self.model = torch.hub.load('..\yolov5','custom', 'weights\{}'.format(weights_select), source='local', device = 'cpu') # path theo terminal
-        self.model = torch.hub.load('..\yolov5','custom', 'weights\sl_600_200e.pt', source='local', device = 'cpu') # path theo terminal
+        self.model = torch.hub.load('..\yolov5','custom', 'weights\yolov5s_640.pt', source='local', device = 'cpu') # path theo terminal
 
     def detect_vehicles(self, frame):
         vehicles_boxes = []

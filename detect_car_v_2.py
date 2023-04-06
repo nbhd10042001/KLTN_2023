@@ -1,56 +1,45 @@
 import cv2
+import numpy as np
+from PIL import ImageGrab
 import time
 from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
-# from pythonDetect.Vehicle_detect import VehicleDetector
-from tracker import *
+
 
 # Load vehicle detector
 vd = VehicleDetector_yolov5()
 
-# Tao doi tuong tracking
-tracker = EuclideanDistTracker()
-vehicle_boxes = []
-
 video = cv2.VideoCapture("video/road_car.mp4")
 # video = cv2.VideoCapture(0)
 
-_, frame = video.read()
-vehicle_boxes, _, _ = vd.detect_vehicles(frame)
-count = 0
+last_time = time.time()
 # Loop through the images
 while True:
-    start = time.time()
-    ret, frame = video.read()
-    count += 1
-    print(count)
-    frame = cv2.resize(frame, [1280,720])
+    # ret, frame = video.read()
+    # frame = cv2.resize(frame, [1280,720])
 
-    if vehicle_boxes == []:
-        vehicle_boxes, _, _ = vd.detect_vehicles(frame)
+    frame = np.array(ImageGrab.grab(bbox=(0,40,800,640)))
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    h, w = frame.shape[0], frame.shape[1]
+    frame = frame[0:int(h-(h/4)),0:w] # [y1:y2, x1:x2]
+
+    vehicle_boxes, _ = vd.detect_vehicles(frame)
 
     if vehicle_boxes:
         for box in vehicle_boxes:
-            x, y, w, h = box
-            # cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
+            x, y, w, h, cf = box
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
 
-    # tracking objects--------------------------------------------------------------------------
-    boxes_ids = tracker.update(vehicle_boxes)
-    for box_id in boxes_ids:
-        x, y, w, h, id = box_id
-        cv2.putText(frame, str(id), (x, y - 15), 0, 2, (0, 255, 0), 2)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
-
-    if count == 10:
-        count = 0
-        vehicle_boxes = []
-    
     cv2.imshow("Car", frame)
 
-    key = cv2.waitKey(1)
-    if key == ord('q'):
+    print("time: "+"{:.4f}s".format(time.time() - last_time))
+    last_time = time.time()
+
+    
+    if cv2.waitKey(25) & 0xFF == ord('q'):
+        video.release()
+        cv2.destroyAllWindows()
         break
     
-    end = time.time()
-    print("frame/s: "+"{:.3f}s".format(end - start))
-video.release()
-cv2.destroyAllWindows()
+
+

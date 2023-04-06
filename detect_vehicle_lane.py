@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from pythonDetect.Lane_detect import LaneDetector
-from pythonDetect.Vehicle_detect import VehicleDetector
 from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 import time
 
@@ -25,9 +24,8 @@ def crop_vehicle(image, boxs):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
-# video = "video/test2.mp4"
-# video = "video/car1.mp4"
-video = "video/car_light6.mp4"
+
+video = "video/lane2.mp4"
 
 cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
@@ -68,12 +66,12 @@ while(cap.isOpened()):
         # threshold
         # line_image = display_lines(lane_image, lines)
         line_image = ld.display_lines(frame2, averaged_lines)
-        combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+        combo_image = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
     else:
         combo_image = frame.copy()
 
     end = time.time()
-    print("frame/second", end - start)
+    # print("frame/second", end - start)
 
     cv2.imshow("cropped_image", cropped_image)
     # cv2.imshow("canny_image", canny_image)

@@ -10,7 +10,7 @@ class LaneDetector:
             slope, intercept = 0.001 ,0
 
         y1 = image.shape[0]
-        y2 = int(y1 - y1/3) #y1*(2/4)
+        y2 = int(y1 - y1/3) 
         x1 = int((y1 - intercept)/slope)
         x2 = int((y2 - intercept)/slope)
         return np.array([x1, y1, x2, y2])
@@ -45,7 +45,7 @@ class LaneDetector:
 
         # ret, thresh = cv2.threshold(gray, 100,255, cv2.THRESH_BINARY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        canny = cv2.Canny(blur, 50, 200, apertureSize=3)
+        canny = cv2.Canny(blur, 50, 150, apertureSize=3)
 
         # result = cv2.bitwise_and(canny, thresh)
         # result = cv2.dilate(result, kernel, iterations=1)
@@ -59,36 +59,35 @@ class LaneDetector:
         temp = [0]
         arr = []
         if lines is not None:
-            for x1, y1, x2, y2 in lines:
-                if (w > x1 > 0  and w > x2 > 0) and ((abs(x1) - abs(x2)) < w/3):
-                    arr.append([x1, y1])
-                    arr.append([x2, y2])
+            line1 = lines[0]
+            line2 = lines[1]
+            x1, y1, x2, y2 = line1
+            x3, y3, x4, y4 = line2
+            if (w > x1 > 0  and w > x2 > 0):
+                x2 += 100
+                y2 -= 100
+                arr.append([x1, y1])
+                arr.append([x2, y2])
+            if (w > x3 > 0  and w > x4 > 0):
+                x4 -= 100
+                y4 -= 100
+                arr.append([x3, y3])
+                arr.append([x4, y4])
             if len(arr) == 4:
-                if (arr[1][0] < arr[3][0])  and (int(w/20) < int(arr[3][0] - arr[1][0]) < int(w/4)):
+                if (arr[1][0] < arr[3][0])  and arr[1][0] < w/2 and arr[3][0] > w/2:
                     temp = arr[2]; arr[2] = arr[3]; arr[3] = temp
-                else:
-                    print("cheo")
-                    # arr[1][0] = arr[1][0] - int(w/25)
-                    # arr[3][0] = arr[3][0] + int(w/25)
-                    # temp = arr[2]; arr[2] = arr[3]; arr[3] = temp
-                
-                    arr[0] = [int(w/5), h]
-                    arr[1] = [int(w/2 - w/25), int(h - h/3)]
-                    arr[2] = [int(w/2 + w/25), int(h - h/3)]
-                    arr[3] = [int(w - w/5), h]
-
-                pts = np.array(arr, np.int32)
-                cv2.fillPoly(line_image, [pts], (0,255,0))
+                    pts = np.array(arr, np.int32)
+                    cv2.fillPoly(line_image, [pts], (0,255,0))
         return line_image
 
     # create mask polygons
     def region_of_interest(self, image):
         h, w = image.shape[0], image.shape[1]
         arr = []
-        p1 = (int(w/25), h)
-        p2 = (int(w/2 - w/30), int(h - h/3))
-        p3 = (int(w/2 + w/30), int(h - h/3))
-        p4 = (int(w - w/25), h)
+        p1 = (int(0), h)
+        p2 = (int(w/2 - (w/4)/4), int(h - h/2))
+        p3 = (int(w/2 + (w/4)/4), int(h - h/2))
+        p4 = (int(w), h)
 
         arr.append([p1, p2, p3, p4])
         polygons = np.array(arr)

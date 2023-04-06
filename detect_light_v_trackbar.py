@@ -3,7 +3,7 @@ import numpy as np
 
 # video = cv2.VideoCapture("video\slow_traffic_small.mp4")
 # video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("./video/car_light6.mp4")
+video = cv2.VideoCapture("./video/car_light2.mp4")
 
 video.set(10, 0)
 video.set(11, 0)
@@ -52,7 +52,7 @@ while True:
         area = cv2.contourArea(cnt)
         # approx = cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
         # loc nhieu
-        if area > 0:
+        if area > 50:
             # cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
             x1, y1, w1, h1 = cv2.boundingRect(cnt)
             cv2.rectangle(frame, (x1 ,y1), (x1 + w1, y1 + h1), (0,255,0), 2)
@@ -72,7 +72,7 @@ while True:
     #     cv2.rectangle(frame, (x1 ,y1), (x1 + w1, y1 + h1), (0,255,0), 2)
         
     
-    # cv2.imshow("mask_crop", mask)
+    cv2.imshow("mask_crop", mask)
     # cv2.imshow("bitw", bitw)
     cv2.imshow("frame", frame)
 

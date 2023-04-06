@@ -1,5 +1,4 @@
 import cv2
-from pythonDetect.Vehicle_detect import VehicleDetector
 from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 import matplotlib.pyplot as plt
 import glob  

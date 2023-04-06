@@ -1,18 +1,18 @@
 import cv2 
 import numpy as np
-from pythonDetect.Lane_detect import LaneDetector
+from pythonDetect.Lane_detectA import LaneDetector
 
 # line detection
 ld = LaneDetector()
 
-video = "video/lane4.mp4"
-# video = "video/lcl7.mp4"
+# video = "video/lane3.mp4"
+video = "video/lcl7.mp4"
 
 cap = cv2.VideoCapture(video)
 while(cap.isOpened()):
     ret, frame = cap.read()
     if not ret:
-        cap = cv2.VideoCapture("video/car_light6.mp4")
+        cap = cv2.VideoCapture(video)
         continue
 
     frame = cv2.resize(frame, [1280, 720])
@@ -21,7 +21,7 @@ while(cap.isOpened()):
     cropped_image = ld.region_of_interest(canny_image)
 
     #detection
-    lines = cv2.HoughLinesP(cropped_image, 1, np.pi/180, 50, np.array([]), minLineLength=10, maxLineGap=10)
+    lines = cv2.HoughLinesP(cropped_image, 1, np.pi/180, 50, np.array([]), minLineLength=10, maxLineGap=100)
     
     if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame, lines)
