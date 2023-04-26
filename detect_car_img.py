@@ -22,7 +22,7 @@ for img_path in images_folder:
     img = cv2.imread(img_path)
     img = cv2.resize(img, [640, 480])
 
-    vehicle_boxes, _ = vd.detect_vehicles(img)
+    vehicle_boxes, cls_b, plateBoxes = vd.detect_vehicles(img)
     # print ("box car:",vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
 
@@ -38,6 +38,10 @@ for img_path in images_folder:
             # #calculate distance
             # dis = ((h_i) / h)
             # cv2.putText(img, "Dis: " + str(round(dis, 2)) + "m", (x, y), 0, 1, (255, 0, 0), 2)
+    if plateBoxes:
+        for box in plateBoxes:
+            x, y, w, h, conf = box
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255,0,0), 2)
 
     end = time.time()
     print("frame/second: ", end - start)

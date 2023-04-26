@@ -6,7 +6,9 @@ from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 # Load vehicle detector
 vd = VehicleDetector_yolov5()
 
-video = cv2.VideoCapture("video/car/car1.mp4")
+# video = cv2.VideoCapture("video/car/car1.mp4")
+# video = cv2.VideoCapture("video/light_blink/.mp4")
+video = cv2.VideoCapture("video/plateCar1.mp4")
 
 # video = cv2.VideoCapture(0)
 
@@ -16,7 +18,7 @@ while True:
     _, frame = video.read()
     frame = cv2.resize(frame, [640 ,480])
 
-    vehicle_boxes, cls_b = vd.detect_vehicles(frame)
+    vehicle_boxes, cls_b, plateBoxes = vd.detect_vehicles(frame)
 
     # print ("dt: ",vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
@@ -30,6 +32,11 @@ while True:
             cv2.putText(frame,"{:.2f}".format(conf), (x, y), 0, 0.5, (0, 0, 255), 1)
             cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
     
+    if plateBoxes:
+        for box in plateBoxes:
+            x, y, w, h, conf = box
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255,255,0), 2)
+
     cv2.imshow("Car", frame)
 
     key = cv2.waitKey(1)
