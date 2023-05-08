@@ -2,10 +2,15 @@ import cv2
 import time
 from pythonDetect.Detect_yolov5 import VehicleDetector_yolov5
 import numpy as np
+import os
+
+pathFile = os.path.dirname(__file__)
+pathVideo = os.path.join(pathFile, 'video')
+mp4 = pathVideo + "/car/car3_Trim.mp4"
 
 # Load vehicle detector
 vd = VehicleDetector_yolov5()
-video = cv2.VideoCapture("video/car/car3_Trim.mp4")
+video = cv2.VideoCapture(mp4)
 # video = cv2.VideoCapture(0)
 font = cv2.FONT_HERSHEY_COMPLEX
 
@@ -40,13 +45,13 @@ def crop_lights_vehicle(image, boxs):
 while True:
     start = time.time()
     ret, frame = video.read()
+    frame = cv2.resize(frame, [640 ,480])
     if not ret:
         cap = cv2.VideoCapture(0)
         continue
 
     frame1 = frame.copy()
-    # frame = cv2.resize(frame, [640 ,480])
-    vehicle_boxes, _ = vd.detect_vehicles(frame)
+    vehicle_boxes, _, _ = vd.detect_vehicles(frame)
     vehicle_count = len(vehicle_boxes) # find number car
     vbox_lags = []
     classCar = []
@@ -63,7 +68,6 @@ while True:
     arr.append([p1, p2, p3, p4])
     pts = np.array(arr, np.int32)
     mask = np.zeros_like(frame)
-
     masked_image = cv2.bitwise_and(frame, mask)
     cv2.line(masked_image, p1, p2, (0, 0, 255), 15)
     cv2.line(masked_image, p3, p4, (0, 0, 255), 15)
