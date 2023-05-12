@@ -5,7 +5,6 @@ class LightSignal_and_Warnings:
 
     def lane_crossing_warning(self, frame, box, masked_image):
         x, y, w, h, conf = box
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
         cv2.putText(frame,"{:.2f}".format(conf), (x, y), 0, 0.5, (255, 255, 0), 1)
         center = [int(x + w/2 -1), int(y + h -1)] #center box of vehicle (-1 de khong bi IndexError: index 480 is out of bounds for axis 0 with size 480)
         cv2.circle(masked_image, center, 5, 255, 2)
@@ -29,22 +28,29 @@ class LightSignal_and_Warnings:
     
     def handle_lightSignal(self,frame, classCar, lightBoxs):
         for car in classCar:
+            cx = car.x # x, y, w, h of car
+            cy = car.y
+            cw = car.w
+            ch = car.h
+            P_car = 2*(cw + ch) # caculate rectangular perimeter
             for lightBox in lightBoxs:
                 xl, yl, wl, hl = lightBox
-                x_cent = xl + int(wl/2)
-                y_cent = yl + int(hl/2)
+                xl_cent = xl + int(wl/2)
+                yl_cent = yl + int(hl/2)
+                if cx <= xl_cent <= (cx + cw) and cy <= yl_cent <= (cy + ch): # check light is exist in car
+                    P_light = 2*(wl + hl)
+                    if P_light > int(P_car*0.1):
+                        # detect turn signal lights 
+                        if (cx <= xl_cent <= (cx + int((cw)/3))) and ((cy) <= yl_cent <= (cy + ch)):
+                            car.turnLeft = True
+                            cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
+                            cv2.putText(frame, "Left", (xl, yl), 0, 0.5, (0, 255, 255), 2)
 
-                # detect turn signal lights 
-                if (car.x <= x_cent <= (car.x + int((car.w)/3))) and ((car.y) <= y_cent <= (car.y + car.h)):
-                    car.turnLeft = True
-                    cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
-                    cv2.putText(frame, "Left", (xl, yl), 0, 0.5, (0, 255, 255), 2)
-
-                if ((car.x + car.w)- int((car.w)/3)) <= x_cent <= (car.x + car.w) and (car.y) <= y_cent <= (car.y + car.h):
-                    car.turnRight = True
-                    cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
-                    cv2.putText(frame, "Right", (xl, yl), 0, 0.5, (0, 255, 255), 2)
-    
+                        if ((cx + cw)- int((cw)/3)) <= xl_cent <= (cx + cw) and (cy) <= yl_cent <= (cy + ch):
+                            car.turnRight = True
+                            cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
+                            cv2.putText(frame, "Right", (xl, yl), 0, 0.5, (0, 255, 255), 2)
+        
             if car.turnRight == True and car.turnLeft == True:
                 cv2.putText(frame,"Warning! Xe dung khan cap!", (20, 80), 0, 1, (0, 255, 255), 2)
             if car.turnRight == True and car.turnLeft == False:
