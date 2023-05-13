@@ -4,8 +4,8 @@ import os
 
 pathFile = os.path.dirname(__file__)
 path1 = os.path.join(pathFile,"..\..\yolov5")
-# path2 = os.path.join(pathFile,"..\weights\yolov5s.pt")
-path2 = os.path.join(pathFile,"..\weights\carl300e.pt")
+path2 = os.path.join(pathFile,"..\weights\yolov5s.pt")
+# path2 = os.path.join(pathFile,"..\weights\carl300e.pt")
 
 class VehicleDetector_yolov5:
 
@@ -34,7 +34,7 @@ class VehicleDetector_yolov5:
                 class_box.append(name)
                 class_box = list(set(class_box))
 
-                if (class_ == 0 and confidence > 0.3) or (class_ == 2 and confidence > 0.5):
+                if (class_ == 0 and confidence > 0.1) or (class_ == 2 and confidence > 0.5):
                     x1 = int(result['xmin'])
                     y1 = int(result['ymin'])
                     x2 = int(result['xmax'])

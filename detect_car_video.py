@@ -7,7 +7,7 @@ pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, "video")
 # video = pathVideo + "/car/car3_Trim.mp4"
 # video = pathVideo + "/light_blink/light_blink2.mp4"
-video = pathVideo + "/lane2.mp4"
+video = pathVideo + "/lane4.mp4"
 
 # Load vehicle detector
 vd = VehicleDetector_yolov5()

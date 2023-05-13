@@ -14,8 +14,8 @@ def crop_vehicle(image, boxs):
     arr = []
     for box in boxs:
         x, y, w, h, _ = box
-        x = x - 20; y = y - 20
-        w = w + 40; h = h + 40
+        # x = x - 20; y = y - 20
+        # w = w + 40; h = h + 40
         # add box to arr
         arr.append([(x, y), (x+w, y), (x+w, y+h), (x, y+h)])
     polygons = np.array(arr)
@@ -35,11 +35,11 @@ while(cap.isOpened()):
     if not ret:
         cap = cv2.VideoCapture(video)
         continue
-    frame = cv2.resize(frame, [1280, 720])
+    frame = cv2.resize(frame, [640, 480])
     frame2 = frame.copy()
 
     # detect vehicle-----------------------------------------------------------------------------------------------
-    vehicle_boxes, _ = vd.detect_vehicles(frame)
+    vehicle_boxes, _, _ = vd.detect_vehicles(frame)
     # print (vehicle_boxes)
     vehicle_count = len(vehicle_boxes)
 
@@ -49,9 +49,10 @@ while(cap.isOpened()):
     if vehicle_boxes:
         for box in vehicle_boxes:
             x, y, w, h, conf = box
-            x_ca = x - 20; y_ca = y - 20
-            w_ca = w + 40; h_ca = h + 40
-            cv2.rectangle(canny_image, (x_ca, y_ca), (x_ca + w_ca, y_ca + h_ca), (0,0,0), 2)
+            # x_ca = x - 20; y_ca = y - 20
+            # w_ca = w + 40; h_ca = h + 40
+            # cv2.rectangle(canny_image, (x_ca, y_ca), (x_ca + w_ca, y_ca + h_ca), (0,0,0), 2)
+            cv2.rectangle(canny_image, (x, y), (x + w, y + h), (0,0,0), 5)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2)
             cv2.putText(frame, "Vehicles: " + str(vehicle_count), (20, 50), 0, 2, (0, 255, 0), 2)
             cv2.putText(frame, "{:.2f}".format(conf), (x, y), 0, 0.5, (0, 255, 0), 2)
@@ -65,7 +66,7 @@ while(cap.isOpened()):
         averaged_lines = ld.average_slope_intercept(frame2, lines)
         # threshold
         # line_image = display_lines(lane_image, lines)
-        line_image = ld.display_lines(frame2, averaged_lines)
+        line_image, _, _ = ld.display_lines(frame2, averaged_lines)
         combo_image = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
     else:
         combo_image = frame.copy()
@@ -74,7 +75,7 @@ while(cap.isOpened()):
     # print("frame/second", end - start)
 
     cv2.imshow("cropped_image", cropped_image)
-    # cv2.imshow("canny_image", canny_image)
+    cv2.imshow("canny_image", canny_image)
     cv2.imshow("result", combo_image)
 
     key = cv2.waitKey(1)
