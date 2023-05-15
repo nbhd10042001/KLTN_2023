@@ -10,8 +10,8 @@ from pythonDetect.Lane_detect import LaneDetector
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
 # mp4 = pathVideo + "/car/car3_Trim.mp4"
-mp4 = pathVideo + "/lane4.mp4"
-# mp4 = pathVideo + "/slow_traffic_small.mp4"
+mp4 = pathVideo + "/lane/ok4.mp4"
+# mp4 = pathVideo + "/lane4.mp4"
 
 # Load file import
 vd = VehicleDetector_yolov5()
@@ -22,6 +22,10 @@ detect_light_warning = LightSignal_and_Warnings()
 video = cv2.VideoCapture(mp4)
 # video = cv2.VideoCapture(0)
 font = cv2.FONT_HERSHEY_COMPLEX
+ScaleAbs_high = False
+ScaleAbs_low = False
+text_ScaleAbs = "None"
+color_selection = "HLS" 
 
 class Car():
     def __init__(self, x, y, w, h):
@@ -45,49 +49,65 @@ def crop_vehicle(image, boxs):
     masked_image = cv2.bitwise_and(image, mask)
     return masked_image
 
-# Loop through the images
 while True:
     start = time.time()
     ret, frame = video.read()
     if not ret:
         video = cv2.VideoCapture(0)
         continue
+    frame = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
+    height, width = frame.shape[0], frame.shape[1]
 
-    if(type(frame) == type(None)):
-        pass
-    else:
-        frame = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
-        frame = cv2.convertScaleAbs(frame, alpha=1, beta=0)
+    if ScaleAbs_high == True:
+        frame = cv2.convertScaleAbs(frame, alpha=1.2, beta=5)
+    if ScaleAbs_low == True:
+        frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
+
+    if color_selection == "RGB":
+        frame_color = ld.RGB_color_selection(frame.copy())
+    if color_selection == "HSV":
+        frame_color = ld.HSV_color_selection(frame.copy())
+    if color_selection == "HLS":
+        frame_color = ld.HLS_color_selection(frame.copy())
+
+    cv2.putText(frame,"color selection: "+ color_selection, (int(width*0.05), int(height*0.9)),
+                         0, 0.5, (255, 0, 0), 2)
+    cv2.putText(frame,"ScaleAbs: "+ text_ScaleAbs, (int(width*0.05), int(height*0.9)+20),
+                        0, 0.5, (255, 0, 0), 2)
 
     frame1 = frame.copy()
-    frame2 = frame.copy()
-    vehicle_boxes, _, light_boxs = vd.detect_vehicles(frame)
-    vehicle_count = len(vehicle_boxes) # find number car
+    car_boxes, vehicle_boxes , light_boxs = vd.detect_vehicles(frame)
     vbox_lags = []
     classCar = []
     lightBoxs = []
-    # cv2.putText(frame, "Number of Vehicles: " + str(vehicle_count), (20, 50), 0, 1, (0, 255, 0), 2)
-    height, width = frame.shape[0], frame.shape[1]
     mask = np.zeros_like(frame)
     masked_image = cv2.bitwise_and(frame, mask)
 
 # - detect lane
     # crop box car to detect lane
+    frame2 = crop_vehicle(frame_color, car_boxes)
     frame2 = crop_vehicle(frame2, vehicle_boxes)
     canny_image = ld.canny(frame2)
+    if car_boxes:
+        for box in car_boxes:
+            x, y, w, h, conf = box
+            cv2.rectangle(canny_image, (x, y), (x + w, y + h), (0,0,0), 5)
+
     if vehicle_boxes:
         for box in vehicle_boxes:
             x, y, w, h, conf = box
             cv2.rectangle(canny_image, (x, y), (x + w, y + h), (0,0,0), 5)
 
     region_image = ld.region_of_interest(canny_image)
-    # perspective_trans, Minv = ld.perspective_transform(frame)
     centCamera = [[int(width/2), height],[int(width/2), int(height*0.95)]]
     cv2.line(frame, centCamera[0], centCamera[1], (255, 0, 0), 2)
 
-    lines = cv2.HoughLinesP(region_image, 1, np.pi/180, 50, np.array([]), minLineLength=10, maxLineGap=10)
-    if lines is not None and len(lines) < 100:
+    lines = cv2.HoughLinesP(region_image, rho = 1, theta = (np.pi/180), threshold = 20,
+                           minLineLength = 20, maxLineGap = 300)
+    # print(len(lines))
+    if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame, lines)
+        # print(averaged_lines)
         line_image, arrayLines, centerPoint = ld.display_lines(frame, averaged_lines)
         # print(arrayLines) # 4 diem lien tiep tao thanh da giac
         if len(arrayLines) == 4 and centerPoint == True:
@@ -117,14 +137,14 @@ while True:
                 if ctCamera_x >= centerLine2:
                     cv2.putText(line_image, "Tai xe re phai", (10, 300), 0, 1, (0, 255, 0), 2)
 
-        if len(arrayLines) == 2:
-            if int(width*0.4) < arrayLines[1][0] < int(width*0.6):
+        if len(arrayLines) == 2 and abs(arrayLines[0][0] - arrayLines[1][0]) < int(width*0.4):
+            if int(width*0.3) < arrayLines[1][0] < int(width*0.9):
                 cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
                 cv2.line(line_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
         
 # - Detect car and lane crossing warning
-    if vehicle_boxes:
-        for box in vehicle_boxes:
+    if car_boxes:
+        for box in car_boxes:
             x, y, w, h, conf = box
             frame, masked_image = detect_light_warning.lane_crossing_warning(frame, box, masked_image)
             # find lag box 
@@ -160,12 +180,33 @@ while True:
     cv2.imshow("mask_image", masked_image)
     cv2.imshow("result", result)
     cv2.imshow("region_image", region_image)
+    cv2.imshow("canny_image", canny_image)
     # cv2.imshow("mask_crop_light", crop_lights)
     # cv2.imshow("frame", frame)
 
-# - press key Q to quit
+# - press key to select options
     key = cv2.waitKey(1)
+    if key == ord('1'):
+        color_selection = "RGB"
+    if key == ord('2'):
+        color_selection = "HSV"
+    if key == ord('3'):
+        color_selection = "HLS"
+
+    if key == ord('h'):
+        ScaleAbs_high = True
+        ScaleAbs_low = False
+        text_ScaleAbs = "High"
+    if key == ord('l'):
+        ScaleAbs_low = True
+        ScaleAbs_high = False
+        text_ScaleAbs = "Low"
+    if key == ord('n'):
+        ScaleAbs_high = False
+        ScaleAbs_low = False
+        text_ScaleAbs = "None"
+
     if key == ord('q'):
+        video.release()
+        cv2.destroyAllWindows()
         break
-video.release()
-cv2.destroyAllWindows()

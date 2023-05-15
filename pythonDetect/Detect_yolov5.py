@@ -20,7 +20,8 @@ class VehicleDetector_yolov5:
     def detect_vehicles(self, frame):
         vehicles_boxes = []
         lightsBox = []
-        class_box = []
+        car_boxes = []
+        class_name = ['person', 'bicycle', 'motorcycle', 'bus', 'truck']
         # detect
         detections = self.model(frame)
         results = detections.pandas().xyxy[0].to_dict(orient="records")
@@ -31,10 +32,7 @@ class VehicleDetector_yolov5:
                 class_ = result['class']
                 confidence = result['confidence']
 
-                class_box.append(name)
-                class_box = list(set(class_box))
-
-                if (class_ == 0 and confidence > 0.1) or (class_ == 2 and confidence > 0.5):
+                if (name == 'car' and confidence > 0.1):
                     x1 = int(result['xmin'])
                     y1 = int(result['ymin'])
                     x2 = int(result['xmax'])
@@ -43,9 +41,21 @@ class VehicleDetector_yolov5:
                     h = y2 - y1
                     conf = confidence
                     box = [x1, y1, w, h, conf]
-                    vehicles_boxes.append(box)
+                    car_boxes.append(box)
 
-                if (class_ == 1 and confidence > 0.1):
+                for n in class_name:
+                    if name == n:
+                        x1 = int(result['xmin'])
+                        y1 = int(result['ymin'])
+                        x2 = int(result['xmax'])
+                        y2 = int(result['ymax'])
+                        w = x2 - x1
+                        h = y2 - y1
+                        conf = confidence
+                        box = [x1, y1, w, h, conf]
+                        vehicles_boxes.append(box)
+
+                if (name == "light" and confidence > 0.1):
                     x1 = int(result['xmin'])
                     y1 = int(result['ymin'])
                     x2 = int(result['xmax'])
@@ -56,32 +66,4 @@ class VehicleDetector_yolov5:
                     box = [x1, y1, w, h, conf]
                     lightsBox.append(box)
     
-        return vehicles_boxes, class_box, lightsBox
-
-    def detect_LightVehicles(self, frame):
-        Light_boxes = []
-        class_box = []
-        # detect
-        detections = self.model(frame)
-        results = detections.pandas().xyxy[0].to_dict(orient="records")
-        
-        if results:
-            for result in results:
-                name = result['name']
-                class_ = result['class']
-                confidence = result['confidence']
-
-                class_box.append(name)
-                class_box = list(set(class_box))
-
-                if (class_ == 0 and confidence > 0.1):
-                    x1 = int(result['xmin'])
-                    y1 = int(result['ymin'])
-                    x2 = int(result['xmax'])
-                    y2 = int(result['ymax'])
-                    w = x2 - x1
-                    h = y2 - y1
-                    conf = confidence
-                    box = [x1, y1, w, h, conf]
-                    Light_boxes.append(box)
-        return Light_boxes, class_box
+        return car_boxes, vehicles_boxes, lightsBox
