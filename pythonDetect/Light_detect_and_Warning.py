@@ -17,10 +17,22 @@ class LightSignal_and_Warnings:
     def create_mask_hsv(self, crop_lights):
         hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
         # find mask and threshold
-        lower = np.array([14, 140, 140])
-        upper = np.array([179, 255, 255])
+        lower = np.uint8([11, 80, 80])
+        upper = np.uint8([30, 255, 255])
 
         mask = cv2.inRange(hsv, lower, upper)
+        kernel = np.ones((5, 5), np.uint8)
+        mask = cv2.dilate(mask, kernel, iterations=2)
+        # mask = cv2.erode(mask, kernel, iterations=2)
+        return mask
+    
+    def create_mask_hls(self, crop_lights):
+        hls = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HLS)
+        # find mask and threshold
+        lower = np.uint8([10, 0, 100])
+        upper = np.uint8([40, 255, 255])
+
+        mask = cv2.inRange(hls, lower, upper)
         kernel = np.ones((5, 5), np.uint8)
         mask = cv2.dilate(mask, kernel, iterations=2)
         # mask = cv2.erode(mask, kernel, iterations=2)
@@ -65,12 +77,12 @@ class LightSignal_and_Warnings:
         for i in range(len(boxs)):
             x, y, w, h, cf = boxs[i]
             # add box to arr
-            h14 = int(h/4)
-            w13 = int(w/3)
-            # arr.append([(x, y + h2), (x + w13, y + h2), (x + w13, y+h), (x, y+h)])
+            h_4 = int(h/4)
+            w_3 = int(w/3)
+            # arr.append([(x, y + h2), (x + w_3, y + h2), (x + w_3, y+h), (x, y+h)])
             # arr.append([(x + w33, y + h2), (x + w, y + h2), (x + w, y+h), (x + w33, y+h)])
-            arr.append([(x, y+h14), (x + w13, y+h14), (x + w13, y+h), (x, y+h)])
-            arr.append([((x+w)-w13, y+h14), (x + w, y+h14), (x + w, y+h), ((x+w)-w13, y+h)])
+            arr.append([(x, y+h_4), (x + w_3, y+h_4), (x + w_3, y+h), (x, y+h)])
+            arr.append([((x+w)-w_3, y+h_4), (x + w, y+h_4), (x + w, y+h), ((x+w)-w_3, y+h)])
         polygons = np.array(arr)
         mask = np.zeros_like(image)
         mask = cv2.fillPoly(mask, polygons, (255,255,255))

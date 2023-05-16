@@ -32,7 +32,7 @@ class VehicleDetector_yolov5:
                 class_ = result['class']
                 confidence = result['confidence']
 
-                if (name == 'car' and confidence > 0.1):
+                if (name == 'car' and confidence > 0.3):
                     x1 = int(result['xmin'])
                     y1 = int(result['ymin'])
                     x2 = int(result['xmax'])
@@ -44,7 +44,7 @@ class VehicleDetector_yolov5:
                     car_boxes.append(box)
 
                 for n in class_name:
-                    if name == n:
+                    if name == n and confidence > 0.3:
                         x1 = int(result['xmin'])
                         y1 = int(result['ymin'])
                         x2 = int(result['xmax'])
@@ -55,7 +55,7 @@ class VehicleDetector_yolov5:
                         box = [x1, y1, w, h, conf]
                         vehicles_boxes.append(box)
 
-                if (name == "light" and confidence > 0.1):
+                if (name == "light" and confidence > 0.5):
                     x1 = int(result['xmin'])
                     y1 = int(result['ymin'])
                     x2 = int(result['xmax'])

@@ -10,7 +10,8 @@ from pythonDetect.Lane_detect import LaneDetector
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
 # mp4 = pathVideo + "/car/car3_Trim.mp4"
-mp4 = pathVideo + "/lane/ok4.mp4"
+mp4 = pathVideo + "/lane/ok6.mp4"
+# mp4 = pathVideo + "/lane/warning1.mp4"
 # mp4 = pathVideo + "/lane4.mp4"
 
 # Load file import
@@ -76,10 +77,10 @@ while True:
                         0, 0.5, (255, 0, 0), 2)
 
     frame1 = frame.copy()
-    car_boxes, vehicle_boxes , light_boxs = vd.detect_vehicles(frame)
+    car_boxes, vehicle_boxes , lightCar_boxes = vd.detect_vehicles(frame)
     vbox_lags = []
     classCar = []
-    lightBoxs = []
+    lightBoxes = []
     mask = np.zeros_like(frame)
     masked_image = cv2.bitwise_and(frame, mask)
 
@@ -141,7 +142,7 @@ while True:
             if int(width*0.3) < arrayLines[1][0] < int(width*0.9):
                 cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
                 cv2.line(line_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
-        
+
 # - Detect car and lane crossing warning
     if car_boxes:
         for box in car_boxes:
@@ -156,24 +157,27 @@ while True:
             else: cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2) # small box car
 
 # - Detect light car
-    if light_boxs:
-        for light_box in light_boxs:
-            x, y, w, h, conf = light_box
+    if lightCar_boxes:
+        for lightCar_box in lightCar_boxes:
+            x, y, w, h, conf = lightCar_box
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0,0,255), 2)
             cv2.putText(frame,"{:.2f}".format(conf), (x, y), 0, 0.5, (0, 0, 255), 1)
 
 # - detect color lights
     crop_lights = detect_light_warning.crop_lights_vehicle(frame1, vbox_lags)
-    mask = detect_light_warning.create_mask_hsv(crop_lights)
+    mask = detect_light_warning.create_mask_hls(crop_lights)
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         for cnt in contours:
             xl, yl, wl, hl = cv2.boundingRect(cnt)
-            lightBoxs.append([xl, yl, wl, hl])
-        frame = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxs)
+            lightBoxes.append([xl, yl, wl, hl])
+        frame = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
     classCar = []
-    result = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
+    if lines is not None:
+        result = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
+    else:
+        result = frame
     end = time.time()
     cv2.putText(result,"fps: {:.3f}s".format(end - start), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
     

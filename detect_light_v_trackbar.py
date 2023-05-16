@@ -4,7 +4,7 @@ import time
 
 # video = cv2.VideoCapture("video\slow_traffic_small.mp4")
 # video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("video/lane/ok3.mp4")
+video = cv2.VideoCapture("video/lane/ok6.mp4")
 # video = cv2.VideoCapture("video/lane3.mp4")
 
 video.set(10, 0)
@@ -25,7 +25,7 @@ cv2.createTrackbar("U-S", "FRAME", 255, 255, nothing)
 cv2.createTrackbar("U-V", "FRAME", 255, 255, nothing)
 
 start = time.time()
-FPS = 30
+FPS = 10
 while True:
     last = time.time()
     if last - start >  (1/FPS):

@@ -45,7 +45,7 @@ class LaneDetector:
         converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
         
         #White color mask
-        lower_threshold = np.uint8([0, 150, 0])
+        lower_threshold = np.uint8([0, 130, 0])
         upper_threshold = np.uint8([255, 255, 255])
         white_mask = cv2.inRange(converted_image, lower_threshold, upper_threshold)
         
@@ -72,10 +72,10 @@ class LaneDetector:
     def region_of_interest(self, image):
         mask = np.zeros_like(image)   
         height, width = image.shape[:2]
-        point_1 = [width * 0.3, height * 0.9]
+        point_1 = [width * 0.3, height * 0.88]
         point_2 = [width * 0.5, height * 0.7]
-        point_3 = [width * 1, height * 0.9]
-        point_4 = [width * 0.7, height * 0.7]
+        point_3 = [width * 0.9, height * 0.88]
+        point_4 = [width * 0.75, height * 0.7]
         polygon = np.array([[point_1, point_2, point_4, point_3]], dtype=np.int32)
         cv2.fillPoly(mask, polygon, 255)
         masked_image = cv2.bitwise_and(image, mask)
@@ -88,7 +88,7 @@ class LaneDetector:
             slope, intercept = 0.0001 ,0
 
         y1 = image.shape[0]
-        y2 = int(y1*0.75)
+        y2 = int(y1*0.7)
         x1 = int((y1 - intercept)/slope)
         x2 = int((y2 - intercept)/slope)
         return np.array([x1, y1, x2, y2])
