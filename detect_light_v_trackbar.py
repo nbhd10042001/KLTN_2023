@@ -4,7 +4,7 @@ import time
 
 # video = cv2.VideoCapture("video\slow_traffic_small.mp4")
 # video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("video/lane/ok6.mp4")
+video = cv2.VideoCapture("video/lane/ok5.mp4")
 # video = cv2.VideoCapture("video/lane3.mp4")
 
 video.set(10, 0)
@@ -17,10 +17,10 @@ def nothing(x):
     pass
 
 cv2.namedWindow('FRAME')
-cv2.createTrackbar("L-H", "FRAME", 0, 255, nothing)
-cv2.createTrackbar("L-S", "FRAME", 150, 255, nothing)
-cv2.createTrackbar("L-V", "FRAME", 0, 255, nothing)
-cv2.createTrackbar("U-H", "FRAME", 255, 255, nothing)
+cv2.createTrackbar("L-H", "FRAME", 10, 255, nothing)
+cv2.createTrackbar("L-S", "FRAME", 0, 255, nothing)
+cv2.createTrackbar("L-V", "FRAME", 100, 255, nothing)
+cv2.createTrackbar("U-H", "FRAME", 40, 255, nothing)
 cv2.createTrackbar("U-S", "FRAME", 255, 255, nothing)
 cv2.createTrackbar("U-V", "FRAME", 255, 255, nothing)
 

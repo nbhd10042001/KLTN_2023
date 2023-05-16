@@ -10,9 +10,9 @@ from pythonDetect.Lane_detect import LaneDetector
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
 # mp4 = pathVideo + "/car/car3_Trim.mp4"
-mp4 = pathVideo + "/lane/ok6.mp4"
+mp4 = pathVideo + "/lane/ok4.mp4"
 # mp4 = pathVideo + "/lane/warning1.mp4"
-# mp4 = pathVideo + "/lane4.mp4"
+# mp4 = pathVideo + "/lane3.mp4"
 
 # Load file import
 vd = VehicleDetector_yolov5()
@@ -77,7 +77,7 @@ while True:
                         0, 0.5, (255, 0, 0), 2)
 
     frame1 = frame.copy()
-    car_boxes, vehicle_boxes , lightCar_boxes = vd.detect_vehicles(frame)
+    vehicle_boxes, bike_boxes , Carlight_boxes = vd.detect_vehicles(frame)
     vbox_lags = []
     classCar = []
     lightBoxes = []
@@ -86,16 +86,16 @@ while True:
 
 # - detect lane
     # crop box car to detect lane
-    frame2 = crop_vehicle(frame_color, car_boxes)
-    frame2 = crop_vehicle(frame2, vehicle_boxes)
+    frame2 = crop_vehicle(frame_color, vehicle_boxes)
+    frame2 = crop_vehicle(frame2, bike_boxes)
     canny_image = ld.canny(frame2)
-    if car_boxes:
-        for box in car_boxes:
+    if vehicle_boxes:
+        for box in vehicle_boxes:
             x, y, w, h, conf = box
             cv2.rectangle(canny_image, (x, y), (x + w, y + h), (0,0,0), 5)
 
-    if vehicle_boxes:
-        for box in vehicle_boxes:
+    if bike_boxes:
+        for box in bike_boxes:
             x, y, w, h, conf = box
             cv2.rectangle(canny_image, (x, y), (x + w, y + h), (0,0,0), 5)
 
@@ -138,14 +138,16 @@ while True:
                 if ctCamera_x >= centerLine2:
                     cv2.putText(line_image, "Tai xe re phai", (10, 300), 0, 1, (0, 255, 0), 2)
 
-        if len(arrayLines) == 2 and abs(arrayLines[0][0] - arrayLines[1][0]) < int(width*0.4):
-            if int(width*0.3) < arrayLines[1][0] < int(width*0.9):
-                cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
-                cv2.line(line_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
+        # if len(arrayLines) == 2 and abs(arrayLines[0][0] - arrayLines[1][0]) < int(width*0.4):
+        #     if int(width*0.3) < arrayLines[1][0] < int(width*0.9):
+        #         cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
+        #         cv2.line(line_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
+
+            
 
 # - Detect car and lane crossing warning
-    if car_boxes:
-        for box in car_boxes:
+    if vehicle_boxes:
+        for box in vehicle_boxes:
             x, y, w, h, conf = box
             frame, masked_image = detect_light_warning.lane_crossing_warning(frame, box, masked_image)
             # find lag box 
@@ -157,8 +159,8 @@ while True:
             else: cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2) # small box car
 
 # - Detect light car
-    if lightCar_boxes:
-        for lightCar_box in lightCar_boxes:
+    if Carlight_boxes:
+        for lightCar_box in Carlight_boxes:
             x, y, w, h, conf = lightCar_box
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0,0,255), 2)
             cv2.putText(frame,"{:.2f}".format(conf), (x, y), 0, 0.5, (0, 0, 255), 1)
@@ -181,7 +183,7 @@ while True:
     end = time.time()
     cv2.putText(result,"fps: {:.3f}s".format(end - start), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
     
-    cv2.imshow("mask_image", masked_image)
+    # cv2.imshow("mask_image", masked_image)
     cv2.imshow("result", result)
     cv2.imshow("region_image", region_image)
     cv2.imshow("canny_image", canny_image)

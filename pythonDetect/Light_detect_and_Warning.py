@@ -52,7 +52,7 @@ class LightSignal_and_Warnings:
                 if cx <= xl_cent <= (cx + cw) and cy <= yl_cent <= (cy + ch): # check light is exist in car
                     car.numberLight += 1
                     P_light = 2*(wl + hl)
-                    if P_light > int(P_car*0.1):
+                    if P_light > int(P_car*0.05):
                         # detect turn signal lights 
                         if (cx <= xl_cent <= (cx + int((cw)/3))) and ((cy) <= yl_cent <= (cy + ch)):
                             car.turnLeft = True
@@ -77,7 +77,7 @@ class LightSignal_and_Warnings:
         for i in range(len(boxs)):
             x, y, w, h, cf = boxs[i]
             # add box to arr
-            h_4 = int(h/4)
+            h_4 = int(h/3)
             w_3 = int(w/3)
             # arr.append([(x, y + h2), (x + w_3, y + h2), (x + w_3, y+h), (x, y+h)])
             # arr.append([(x + w33, y + h2), (x + w, y + h2), (x + w, y+h), (x + w33, y+h)])

@@ -20,8 +20,9 @@ class VehicleDetector_yolov5:
     def detect_vehicles(self, frame):
         vehicles_boxes = []
         lightsBox = []
-        car_boxes = []
-        class_name = ['person', 'bicycle', 'motorcycle', 'bus', 'truck']
+        name_boxes = []
+        class_name = ['person', 'bicycle', 'motorcycle']
+        class_car = ['car', 'bus', 'truck']
         # detect
         detections = self.model(frame)
         results = detections.pandas().xyxy[0].to_dict(orient="records")
@@ -32,16 +33,17 @@ class VehicleDetector_yolov5:
                 class_ = result['class']
                 confidence = result['confidence']
 
-                if (name == 'car' and confidence > 0.3):
-                    x1 = int(result['xmin'])
-                    y1 = int(result['ymin'])
-                    x2 = int(result['xmax'])
-                    y2 = int(result['ymax'])
-                    w = x2 - x1
-                    h = y2 - y1
-                    conf = confidence
-                    box = [x1, y1, w, h, conf]
-                    car_boxes.append(box)
+                for m in class_car:
+                    if name == m and confidence > 0.3:
+                        x1 = int(result['xmin'])
+                        y1 = int(result['ymin'])
+                        x2 = int(result['xmax'])
+                        y2 = int(result['ymax'])
+                        w = x2 - x1
+                        h = y2 - y1
+                        conf = confidence
+                        box = [x1, y1, w, h, conf]
+                        vehicles_boxes.append(box)
 
                 for n in class_name:
                     if name == n and confidence > 0.3:
@@ -53,7 +55,7 @@ class VehicleDetector_yolov5:
                         h = y2 - y1
                         conf = confidence
                         box = [x1, y1, w, h, conf]
-                        vehicles_boxes.append(box)
+                        name_boxes.append(box)
 
                 if (name == "light" and confidence > 0.5):
                     x1 = int(result['xmin'])
@@ -66,4 +68,4 @@ class VehicleDetector_yolov5:
                     box = [x1, y1, w, h, conf]
                     lightsBox.append(box)
     
-        return car_boxes, vehicles_boxes, lightsBox
+        return vehicles_boxes, name_boxes, lightsBox
