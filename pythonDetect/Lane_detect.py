@@ -74,18 +74,10 @@ class LaneDetector:
         mask = np.zeros_like(image)   
         height, width = image.shape[:2]
         point_1 = [width * 0.3, height * 0.88]
-        point_2 = [width * 0.5, height * 0.7]
-        point_3 = [width * 0.75, height * 0.7]
+        point_2 = [width * 0.5, height * 0.69]
+        point_3 = [width * 0.75, height * 0.69]
         point_4 = [width * 0.9, height * 0.88]
-
-        w_05 = int(width*0.15)
-        d = int((point_3[0] - point_2[0]) / 2)
-        point_5 = [point_1[0] + w_05, point_1[1]]
-        point_6 = [point_2[0] + d   , point_2[1]]
-        point_7 = [point_3[0] - d   , point_3[1]]
-        point_8 = [point_4[0] - w_05, point_4[1]]
         arr.append([point_1, point_2, point_3, point_4])
-        # arr.append([point_5, point_6, point_7, point_8])
         polygon = np.array(arr, dtype=np.int32)
         cv2.fillPoly(mask, polygon, 255)
         masked_image = cv2.bitwise_and(image, mask)
@@ -133,55 +125,34 @@ class LaneDetector:
         h, w = image.shape[0], image.shape[1]
         temp = [0]
         arr = []
-        centerLine = False
+        two_lines = False
+        one_line = False
         if lines is not None:
             for x1, y1, x2, y2 in lines:
                 if (0 < x1 < w  and 0 < x2 < w):
                     arr.append([x1, y1])
                     arr.append([x2, y2])
             if len(arr) == 4:
-                temp = arr[2]; arr[2] = arr[3]; arr[3] = temp
+                temp = arr[2]; arr[2] = arr[3]; arr[3] = temp # doi vi tri cac diem da giac
                 p1 = arr[0]; p2 = arr[1]; p3 = arr[2]; p4 = arr[3]
                 if ((p2[0] < p3[0] - int(w*0.05)) 
-                    and (p2[0] - p1[0] < int(w*0.4)) 
-                    and (p4[0] - p3[0] < int(w*0.4))):
-                    if (int(w*0.3) < p3[0] < int(w*0.9)) and  (int(w*0.3) < p2[0] < int(w*0.9)):
+                    and (p2[0] - p1[0] < int(w*0.5)) 
+                    and (p4[0] - p3[0] < int(w*0.5))):
+                    if (int(w*0.4) < p3[0] < int(w*0.8)) and  (int(w*0.2) < p2[0] < int(w*0.6)):
                         pts = np.array(arr, np.int32)
                         cv2.fillPoly(line_image, [pts], (0,255,0))
                         cv2.line(line_image, p1, p2, (0, 0, 255), 5)
                         cv2.line(line_image, p3, p4, (0, 0, 255), 5)
-                        centerLine = True
+                        two_lines = True
             if len(arr) == 2:
-                a = int(w*0.1)
                 p1_x = arr[0][0]
-                p1_y = arr[0][1]
                 p2_x = arr[1][0]
-                p2_y = arr[1][1]
-                if p1_x < p2_x:
-                    d = p2_x - p1_x
-                    p3_x = p2_x + a
-                    p4_x = p3_x + d
-                    arr.append([p3_x, p2_y])
-                    arr.append([p4_x, p1_y])
-                if p1_x > p2_x:
-                    arr = []
-                    d = p1_x - p2_x
-                    p3_x = p2_x - a
-                    p4_x = p3_x - d
-                    arr.append([p1_x, p1_y])
-                    arr.append([p2_x, p2_y])
-                    arr.append([p3_x, p2_y])
-                    arr.append([p4_x, p1_y])
-
-                p1 = arr[0]; p2 = arr[1]; p3 = arr[2]; p4 = arr[3]
-                if ((p2[0] < p3[0] - int(w*0.05)) 
-                    and (p2[0] - p1[0] < int(w*0.4)) 
-                    and (p4[0] - p3[0] < int(w*0.4))):
-                    if (int(w*0.3) < p3[0] < int(w*0.9)) and  (int(w*0.3) < p2[0] < int(w*0.9)):
-                        cv2.line(line_image, arr[0], arr[1], (0, 0, 255), 5)
-                        cv2.line(line_image, arr[2], arr[3], (0, 100, 180), 5)
-                
-        return line_image, arr ,centerLine
+                if ((p1_x < p2_x and p1_x < int(w*0.6) and p2_x < int(w*0.6))
+                    or (p1_x > p2_x and p1_x > int(w*0.4) and p2_x > int(w*0.4))):
+                    cv2.line(line_image, arr[0], arr[1], (0, 0, 255), 5)
+                    one_line = True
+                    
+        return line_image, arr ,two_lines, one_line
 
 
     
