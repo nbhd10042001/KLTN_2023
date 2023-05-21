@@ -27,7 +27,7 @@ class LaneDetector:
         
         #White color mask
         lower_threshold = np.uint8([0, 0, 150])
-        upper_threshold = np.uint8([255, 20, 255])
+        upper_threshold = np.uint8([170, 135, 255])
         white_mask = cv2.inRange(converted_image, lower_threshold, upper_threshold)
         
         #Yellow color mask
@@ -87,7 +87,7 @@ class LaneDetector:
         try:
             slope, intercept = line_parameters
         except TypeError:
-            slope, intercept = 0.0001 ,0
+            slope, intercept = 0.00001 ,0
 
         y1 = image.shape[0]
         y2 = int(y1*0.7)
@@ -102,15 +102,14 @@ class LaneDetector:
         right_line = np.array([0, 0, 0, 0])
 
         for line in lines:
-            x1,y1,x2,y2 =line.reshape(4)
-            parameters = np.polyfit((x1, x2), (y1, y2), 1)
-            # print("======="+ parameters)
-            slope = parameters[0]
-            intercept = parameters[1]
-            if slope < 0:
-                left_fit.append((slope, intercept))
-            else:
-                right_fit.append((slope, intercept))
+            for x1, y1, x2, y2 in line:
+                parameters = np.polyfit((x1, x2), (y1, y2), 1)
+                slope = parameters[0]
+                intercept = parameters[1]
+                if slope < 0:
+                    left_fit.append((slope, intercept))
+                else:
+                    right_fit.append((slope, intercept))
         if left_fit:
             left_fit_average = np.average(left_fit, axis=0)
             left_line = abs(self.pixel_points(image, left_fit_average))

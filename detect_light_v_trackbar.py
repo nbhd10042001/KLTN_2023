@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 import time
 
-# video = cv2.VideoCapture("video\slow_traffic_small.mp4")
-# video = cv2.VideoCapture("video\car_light3_Trim.mp4")
-video = cv2.VideoCapture("video/lane/ok5.mp4")
-# video = cv2.VideoCapture("video/lane3.mp4")
+# mp4 = "video/blink.mp4"
+# mp4 = "video/light_blink/blink5.mp4"
+mp4 = "video/lane/ok6.mp4"
+video = cv2.VideoCapture(mp4)
 
 video.set(10, 0)
 video.set(11, 0)
@@ -17,9 +17,9 @@ def nothing(x):
     pass
 
 cv2.namedWindow('FRAME')
-cv2.createTrackbar("L-H", "FRAME", 10, 255, nothing)
-cv2.createTrackbar("L-S", "FRAME", 0, 255, nothing)
-cv2.createTrackbar("L-V", "FRAME", 100, 255, nothing)
+cv2.createTrackbar("L-H", "FRAME", 20, 255, nothing)
+cv2.createTrackbar("L-S", "FRAME", 20, 255, nothing)
+cv2.createTrackbar("L-V", "FRAME", 255, 255, nothing)
 cv2.createTrackbar("U-H", "FRAME", 40, 255, nothing)
 cv2.createTrackbar("U-S", "FRAME", 255, 255, nothing)
 cv2.createTrackbar("U-V", "FRAME", 255, 255, nothing)
@@ -31,13 +31,15 @@ while True:
     if last - start >  (1/FPS):
         start = last
         #load img
-        _, frame = video.read(0)
-        # frame = cv2.convertScaleAbs(frame, alpha=1.5, beta=10)
+        ret, frame = video.read(0)
+        if not ret:
+            video = cv2.VideoCapture(mp4)
+            continue
+        # frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=10)
         frame = cv2.resize(frame, [640, 480])
 
         # detect color lights
-        # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HLS)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         l_h = cv2.getTrackbarPos('L-H', 'FRAME')
         l_s = cv2.getTrackbarPos('L-S', 'FRAME')
@@ -53,7 +55,7 @@ while True:
         bitw = cv2.bitwise_and(frame, frame, mask=mask)
         kernel = np.ones((5, 5), np.uint8)
 
-        # mask = cv2.dilate(mask, kernel, iterations=3)
+        mask = cv2.dilate(mask, kernel, iterations=2)
         # mask = cv2.erode(mask, kernel, iterations=2)
         # mask = cv2.dilate(mask, kernel, iterations=8)
 
@@ -85,7 +87,7 @@ while True:
             
         
         cv2.imshow("mask_crop", mask)
-        # cv2.imshow("bitw", bitw)
+        cv2.imshow("bitw", bitw)
         cv2.imshow("frame", frame)
 
     key = cv2.waitKey(1)

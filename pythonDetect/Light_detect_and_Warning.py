@@ -17,24 +17,12 @@ class LightSignal_and_Warnings:
     def create_mask_hsv(self, crop_lights):
         hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
         # find mask and threshold
-        lower = np.uint8([11, 80, 80])
-        upper = np.uint8([30, 255, 255])
+        lower = np.uint8([20, 20, 255])
+        upper = np.uint8([40, 255, 255])
 
         mask = cv2.inRange(hsv, lower, upper)
         kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.dilate(mask, kernel, iterations=2)
-        # mask = cv2.erode(mask, kernel, iterations=2)
-        return mask
-    
-    def create_mask_hls(self, crop_lights):
-        hls = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HLS)
-        # find mask and threshold
-        lower = np.uint8([10, 0, 100])
-        upper = np.uint8([40, 255, 255])
-
-        mask = cv2.inRange(hls, lower, upper)
-        kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.dilate(mask, kernel, iterations=2)
+        mask = cv2.dilate(mask, kernel, iterations=3)
         # mask = cv2.erode(mask, kernel, iterations=2)
         return mask
     
