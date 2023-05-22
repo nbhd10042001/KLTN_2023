@@ -9,8 +9,8 @@ from pythonDetect.Lane_detect import LaneDetector
 # Load path
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
-mp4 = pathVideo + "/lane/warning1.mp4"
-# mp4 = pathVideo + "/lane/ok6.mp4"
+# mp4 = pathVideo + "/lane/warning1.mp4"
+mp4 = pathVideo + "/lane/ok4.mp4"
 # mp4 = pathVideo + "/lane4.mp4"
 
 # Load file import
@@ -25,6 +25,8 @@ font = cv2.FONT_HERSHEY_COMPLEX
 text_ScaleAbs = "None"
 color_selection = 3
 color_selec_text = ""
+fps_count = 0
+fps = 0
 
 class Car():
     def __init__(self, x, y, w, h):
@@ -55,18 +57,17 @@ def changeScaleAbs(frame, text_ScaleAbs):
     upper = np.array([80, 255, 255], dtype="uint8")
     mask = cv2.inRange(hsv, lower, upper)
     brightness = np.average(mask)
-    print(brightness)
+    # print(brightness)
     if brightness > 90:
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
         text_ScaleAbs = "Low"
     if brightness < 5:
         frame = cv2.convertScaleAbs(frame, alpha=1.2, beta=5)
         text_ScaleAbs = "High"
-
     return frame, text_ScaleAbs
 
+start = time.time()
 while True:
-    start = time.time()
     ret, frame = video.read()
     if not ret:
         video = cv2.VideoCapture(0)
@@ -165,12 +166,20 @@ while True:
 
     classCar = []
     if lines is not None:
-        result = cv2.addWeighted(frame, 1, line_image, 0.5, 1)
-    else:
-        result = frame
+        result = cv2.addWeighted(frame, 1, line_image, 0.3, 1)
+    else: result = frame
+        
+# - caculate FPS 
     end = time.time()
-    cv2.putText(result,"fps: {:.3f}s".format(end - start), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
-    
+    fps_count += 1
+    if (end - start) >= 1:
+        start = end
+        fps = fps_count
+        cv2.putText(result,"fps: {}".format(fps_count), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
+        fps_count = 0
+    else:
+        cv2.putText(result,"fps: {}".format(fps), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
+
     cv2.imshow("mask_image", masked_image)
     cv2.imshow("result", result)
     cv2.imshow("region_image", region_image)

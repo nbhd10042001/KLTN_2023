@@ -4,8 +4,8 @@ import os
 
 pathFile = os.path.dirname(__file__)
 path1 = os.path.join(pathFile,"..\..\yolov5")
-path2 = os.path.join(pathFile,"..\weights\yolov5s.pt")
-# path2 = os.path.join(pathFile,"..\weights\ylv5s_2005.pt")
+# path2 = os.path.join(pathFile,"..\weights\yolov5s.pt")
+path2 = os.path.join(pathFile,"..\weights\ylv5s_2205.pt")
 
 class VehicleDetector_yolov5:
 
@@ -15,12 +15,12 @@ class VehicleDetector_yolov5:
         # model = torch.hub.load('','yolov5', 'weights\yolov5s', source='local')
         # self.model = torch.hub.load('..\yolov5','custom', 'weights\{}'.format(weights_select), source='local', device = 'cpu') # path theo terminal
         # self.model = torch.hub.load('..\yolov5','custom', 'weights\car_lights1.pt', source='local', device = 'cpu') # path theo terminal
-        self.model = torch.hub.load(path1,'custom', path2, source='local', device = 'cpu') # path theo terminal
+        self.model = torch.hub.load(path1,'custom', path2, source='local') # path theo terminal
 
     def detect_vehicles(self, frame):
         vehicles_boxes = []
         bike_boxes = []
-        class_bike = ['Person', 'bicycle', 'motorbike', 'wheelbarrow', 'three wheelers -CNG-', 'auto rickshaw', 'rickshaw', 'scooter']
+        class_bike = ['Person', 'person', 'bicycle', 'motorbike', 'wheelbarrow', 'three wheelers -CNG-', 'auto rickshaw', 'rickshaw', 'scooter']
         class_car = ['ambulance', 'army vehicle', 'bus', 'car', 'garbagevan', 'human hauler', 'minibus', 'minivan', 'pickup', 'policecar', 'suv', 'taxi', 'truck', 'van']
         # detect
         detections = self.model(frame)
@@ -32,7 +32,7 @@ class VehicleDetector_yolov5:
                 confidence = result['confidence']
 
                 for m in class_car:
-                    if name == m and confidence > 0.2:
+                    if name == m and confidence > 0.1:
                         x1 = int(result['xmin'])
                         y1 = int(result['ymin'])
                         x2 = int(result['xmax'])
@@ -44,7 +44,7 @@ class VehicleDetector_yolov5:
                         vehicles_boxes.append(box)
 
                 for n in class_bike:
-                    if name == n and confidence > 0.2:
+                    if name == n and confidence > 0.1:
                         x1 = int(result['xmin'])
                         y1 = int(result['ymin'])
                         x2 = int(result['xmax'])
