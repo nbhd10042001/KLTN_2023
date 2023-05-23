@@ -8,11 +8,8 @@ path1 = os.path.join(pathFile,"..\..\yolov5")
 path2 = os.path.join(pathFile,"..\weights\ylv5s_2205.pt")
 
 class VehicleDetector_yolov5:
-
     def __init__(self):
         # load model
-        # weights_select  = input("select your weights: ")
-        # model = torch.hub.load('','yolov5', 'weights\yolov5s', source='local')
         # self.model = torch.hub.load('..\yolov5','custom', 'weights\{}'.format(weights_select), source='local', device = 'cpu') # path theo terminal
         # self.model = torch.hub.load('..\yolov5','custom', 'weights\car_lights1.pt', source='local', device = 'cpu') # path theo terminal
         self.model = torch.hub.load(path1,'custom', path2, source='local') # path theo terminal

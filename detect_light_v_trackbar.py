@@ -4,7 +4,8 @@ import time
 
 # mp4 = "video/blink.mp4"
 # mp4 = "video/light_blink/blink5.mp4"
-mp4 = "video/lane/ok6.mp4"
+# mp4 = "video/lane/ok6.mp4"
+mp4 = "video/lane/light2.mp4"
 video = cv2.VideoCapture(mp4)
 
 video.set(10, 0)
@@ -55,7 +56,7 @@ while True:
         bitw = cv2.bitwise_and(frame, frame, mask=mask)
         kernel = np.ones((5, 5), np.uint8)
 
-        mask = cv2.dilate(mask, kernel, iterations=2)
+        mask = cv2.dilate(mask, kernel, iterations=3)
         # mask = cv2.erode(mask, kernel, iterations=2)
         # mask = cv2.dilate(mask, kernel, iterations=8)
 
@@ -87,7 +88,7 @@ while True:
             
         
         cv2.imshow("mask_crop", mask)
-        cv2.imshow("bitw", bitw)
+        # cv2.imshow("bitw", bitw)
         cv2.imshow("frame", frame)
 
     key = cv2.waitKey(1)

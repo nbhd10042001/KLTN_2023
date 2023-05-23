@@ -9,8 +9,8 @@ from pythonDetect.Lane_detect import LaneDetector
 # Load path
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
-# mp4 = pathVideo + "/lane/warning1.mp4"
-mp4 = pathVideo + "/lane/ok4.mp4"
+mp4 = pathVideo + "/lane/light2.mp4"
+# mp4 = pathVideo + "/lane/ok6.mp4"
 # mp4 = pathVideo + "/lane4.mp4"
 
 # Load file import
@@ -86,10 +86,10 @@ while True:
         frame_color = ld.HLS_color_selection(frame.copy())
         color_selec_text = "HLS"
 
-    cv2.putText(frame,"color selection: "+ color_selec_text, (int(width*0.05), int(height*0.9)),
-                         0, 0.5, (255, 0, 0), 2)
-    cv2.putText(frame,"ScaleAbs: "+ text_ScaleAbs, (int(width*0.05), int(height*0.9)+20),
+    cv2.putText(frame,"ScaleAbs: "+ text_ScaleAbs, (int(width - width/4), 40),
                         0, 0.5, (255, 0, 0), 2)
+    cv2.putText(frame,"Color Select: "+ color_selec_text, (int(width - width/4), 60),
+                         0, 0.5, (255, 0, 0), 2)
 
     frame1 = frame.copy()
     vehicle_boxes, bike_boxes = vd.detect_vehicles(frame)
@@ -131,11 +131,11 @@ while True:
             cv2.line(line_image, p_ctLine2_x, p_ctLine2_y, (0, 255, 255), 2)
 
             #draw mask img
-            cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 8)
-            cv2.line(masked_image, arrayLines[2], arrayLines[3], (0, 0, 255), 8)
+            cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 10)
+            cv2.line(masked_image, arrayLines[2], arrayLines[3], (0, 0, 255), 10)
 
         if len(arrayLines) == 2 and one_line == True:
-            cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 5) # draw line on masked_image
+            cv2.line(masked_image, arrayLines[0], arrayLines[1], (0, 0, 255), 10) # draw line on masked_image
 
             
 # - Detect car and lane crossing warning
@@ -156,8 +156,8 @@ while True:
 
 # - detect color lights
     crop_lights = detect_light_warning.crop_lights_vehicle(frame1, vboxes_near)
-    mask = detect_light_warning.create_mask_hsv(crop_lights)
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    mask_light = detect_light_warning.create_mask_hsv(crop_lights)
+    contours, _ = cv2.findContours(mask_light, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         for cnt in contours:
             xl, yl, wl, hl = cv2.boundingRect(cnt)
@@ -165,6 +165,7 @@ while True:
         frame = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
     classCar = []
+    lines = None
     if lines is not None:
         result = cv2.addWeighted(frame, 1, line_image, 0.3, 1)
     else: result = frame
@@ -175,16 +176,18 @@ while True:
     if (end - start) >= 1:
         start = end
         fps = fps_count
-        cv2.putText(result,"fps: {}".format(fps_count), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
+        cv2.putText(result,"FPS: {}".format(fps_count), (int(width - width/4), 20), 0, 0.5, (255, 0, 0), 2)
         fps_count = 0
     else:
-        cv2.putText(result,"fps: {}".format(fps), (int(width - width/4), 50), 0, 0.5, (255, 0, 0), 2)
+        cv2.putText(result,"FPS: {}".format(fps), (int(width - width/4), 20), 0, 0.5, (255, 0, 0), 2)
 
+# - Show results
     cv2.imshow("mask_image", masked_image)
     cv2.imshow("result", result)
-    cv2.imshow("region_image", region_image)
-    cv2.imshow("canny_image", canny_image)
+    # cv2.imshow("region_image", region_image)
+    # cv2.imshow("canny_image", canny_image)
     # cv2.imshow("mask_crop_light", crop_lights)
+    cv2.imshow("mask_light", mask_light)
     # cv2.imshow("frame", frame)
 
 # - press key to select options

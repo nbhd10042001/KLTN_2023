@@ -17,8 +17,8 @@ class LightSignal_and_Warnings:
     def create_mask_hsv(self, crop_lights):
         hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
         # find mask and threshold
-        lower = np.uint8([20, 20, 255])
-        upper = np.uint8([40, 255, 255])
+        lower = np.array([18, 20, 255], dtype="uint8")
+        upper = np.array([50, 255, 255], dtype="uint8")
 
         mask = cv2.inRange(hsv, lower, upper)
         kernel = np.ones((5, 5), np.uint8)
@@ -40,7 +40,7 @@ class LightSignal_and_Warnings:
                 if cx <= xl_cent <= (cx + cw) and cy <= yl_cent <= (cy + ch): # check light is exist in car
                     car.numberLight += 1
                     P_light = 2*(wl + hl)
-                    if P_light > int(P_car*0.05):
+                    if P_light > int(P_car*0.03):
                         # detect turn signal lights 
                         if (cx <= xl_cent <= (cx + int((cw)/3))) and ((cy) <= yl_cent <= (cy + ch)):
                             car.turnLeft = True
@@ -53,11 +53,14 @@ class LightSignal_and_Warnings:
                             cv2.putText(frame, "Right", (xl, yl), 0, 0.3, (0, 255, 255), 1)
             if car.numberLight < 3:
                 if car.turnRight == True and car.turnLeft == True:
-                    cv2.putText(frame,"Warning! Xe dung khan cap!", (10, 40), 0, 0.5, (0, 255, 255), 2)
+                    cv2.putText(frame,"Warning! Xe dung khan cap!", (10, 40), 0, 0.5, (0, 0, 255), 2)
+                    cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 0, 255), 2)
                 if car.turnRight == True and car.turnLeft == False:
                     cv2.putText(frame,"Warning! Xe re", (10, 60), 0, 0.5, (0, 255, 255), 2)
+                    cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
                 if car.turnRight == False and car.turnLeft == True:
                     cv2.putText(frame,"Warning! Xe re", (10, 60), 0, 0.5, (0, 255, 255), 2)
+                    cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
         return frame
     
     def crop_lights_vehicle(self, image, boxs):
@@ -65,12 +68,12 @@ class LightSignal_and_Warnings:
         for i in range(len(boxs)):
             x, y, w, h, cf = boxs[i]
             # add box to arr
-            h_4 = int(h/3)
+            h_3 = int(h/3)
             w_3 = int(w/3)
             # arr.append([(x, y + h2), (x + w_3, y + h2), (x + w_3, y+h), (x, y+h)])
             # arr.append([(x + w33, y + h2), (x + w, y + h2), (x + w, y+h), (x + w33, y+h)])
-            arr.append([(x, y+h_4), (x + w_3, y+h_4), (x + w_3, y+h), (x, y+h)])
-            arr.append([((x+w)-w_3, y+h_4), (x + w, y+h_4), (x + w, y+h), ((x+w)-w_3, y+h)])
+            arr.append([(x, y+h_3), (x + w_3, y+h_3), (x + w_3, y+h), (x, y+h)])
+            arr.append([((x+w)-w_3, y+h_3), (x + w, y+h_3), (x + w, y+h), ((x+w)-w_3, y+h)])
         polygons = np.array(arr)
         mask = np.zeros_like(image)
         mask = cv2.fillPoly(mask, polygons, (255,255,255))

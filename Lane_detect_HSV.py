@@ -6,8 +6,8 @@ import glob
 pathCurrent = os.path.dirname(__file__)
 pathVideo = os.path.join(pathCurrent, "video/")
 
-video = pathVideo + "lane/ok2.mp4"
-video = pathVideo + "lane3.mp4"
+video = pathVideo + "lane/ok6.mp4"
+# video = pathVideo + "lane3.mp4"
 # video = pathVideo + "lcl7.mp4"
 vd = cv2.VideoCapture(video)
 
@@ -50,7 +50,7 @@ def HSV_color_selection(image):
     #Combine white and yellow masks
     mask = cv2.bitwise_or(white_mask, yellow_mask)
     masked_image = cv2.bitwise_and(image, image, mask = mask)
-    return masked_image
+    return masked_image, white_mask, yellow_mask, mask
 
 def HLS_color_selection(image):
     #Convert the input image to HSL
@@ -173,9 +173,12 @@ while(True):
     if ScaleAbs_low == True:
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
 
-    frame = cv2.resize(frame, [640,480])
+
+    frame = cv2.resize(frame, [int(640),int(480)])
+    frame1 = cv2.convertScaleAbs(frame, alpha=0.6, beta=5)
+    frame2 = cv2.convertScaleAbs(frame, alpha=1.4, beta=5)
     frame_RGB = RGB_color_selection(frame)
-    frame_HSV = HSV_color_selection(frame)
+    frame_HSV, wm, ym, mask1 = HSV_color_selection(frame)
     frame_HLS = HLS_color_selection(frame)
     
     gray_RGB = cv2.cvtColor(frame_RGB, cv2.COLOR_RGB2GRAY)
@@ -203,13 +206,16 @@ while(True):
     
     # line_image = draw_lines(frame, hough_lines_HLS)
 
-    lane_image = draw_lane_lines(frame, lane_lines(frame, hough_lines_HLS))
+    # lane_image = draw_lane_lines(frame, lane_lines(frame, hough_lines_HLS))
+    
     # cv2.imshow('frame_RGB',frame_RGB)
     # cv2.imshow('frame_HSV',frame_HSV)n
     # cv2.imshow('frame_HSL',frame_HSL)
-    cv2.imshow('lane_image',lane_image)
+    # cv2.imshow('lane_image',lane_image)
 
     cv2.imshow('frame',frame)
+    cv2.imshow('Low',frame1)
+    cv2.imshow('High',frame2)
 
     key = cv2.waitKey(1)
     if key == ord('h'):

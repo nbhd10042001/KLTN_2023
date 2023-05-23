@@ -81,6 +81,7 @@ class LaneDetector:
         polygon = np.array(arr, dtype=np.int32)
         cv2.fillPoly(mask, polygon, 255)
         masked_image = cv2.bitwise_and(image, mask)
+        
         return masked_image
 
     def pixel_points(self, image, line_parameters):
@@ -106,6 +107,8 @@ class LaneDetector:
                 parameters = np.polyfit((x1, x2), (y1, y2), 1)
                 slope = parameters[0]
                 intercept = parameters[1]
+                # slope = (y2 - y1) / (x2 - x1)
+                # intercept = y1 - (slope * x1)
                 if slope < 0:
                     left_fit.append((slope, intercept))
                 else:
