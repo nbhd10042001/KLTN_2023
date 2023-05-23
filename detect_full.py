@@ -165,7 +165,6 @@ while True:
         frame = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
     classCar = []
-    lines = None
     if lines is not None:
         result = cv2.addWeighted(frame, 1, line_image, 0.3, 1)
     else: result = frame
