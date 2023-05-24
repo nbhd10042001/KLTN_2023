@@ -115,10 +115,10 @@ class LaneDetector:
                     right_fit.append((slope, intercept))
         if left_fit:
             left_fit_average = np.average(left_fit, axis=0)
-            left_line = abs(self.pixel_points(image, left_fit_average))
+            left_line = (self.pixel_points(image, left_fit_average))
         if right_fit:
             right_fit_average = np.average(right_fit, axis=0)
-            right_line = abs(self.pixel_points(image, right_fit_average))
+            right_line = (self.pixel_points(image, right_fit_average))
         return np.array([left_line, right_line])
 
     def display_lines (self, image, lines):

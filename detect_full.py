@@ -9,8 +9,8 @@ from pythonDetect.Lane_detect import LaneDetector
 # Load path
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
-mp4 = pathVideo + "/lane/light2.mp4"
-# mp4 = pathVideo + "/lane/ok6.mp4"
+# mp4 = pathVideo + "/lane/light2.mp4"
+mp4 = pathVideo + "/lane/ok6.mp4"
 # mp4 = pathVideo + "/lane4.mp4"
 
 # Load file import
@@ -61,7 +61,7 @@ def changeScaleAbs(frame, text_ScaleAbs):
     if brightness > 90:
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
         text_ScaleAbs = "Low"
-    if brightness < 5:
+    if brightness < 2:
         frame = cv2.convertScaleAbs(frame, alpha=1.2, beta=5)
         text_ScaleAbs = "High"
     return frame, text_ScaleAbs
@@ -107,7 +107,7 @@ while True:
 
     region_image = ld.region_of_interest(canny_image)
     lines = cv2.HoughLinesP(region_image, rho = 1, theta = (np.pi/180), threshold = 20,
-                           minLineLength = 10, maxLineGap = 300)
+                           minLineLength = 20, maxLineGap = 300)
     # print(len(lines))
     if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame, lines)
@@ -183,10 +183,10 @@ while True:
 # - Show results
     cv2.imshow("mask_image", masked_image)
     cv2.imshow("result", result)
-    # cv2.imshow("region_image", region_image)
+    cv2.imshow("region_image", region_image)
     # cv2.imshow("canny_image", canny_image)
     # cv2.imshow("mask_crop_light", crop_lights)
-    cv2.imshow("mask_light", mask_light)
+    # cv2.imshow("mask_light", mask_light)
     # cv2.imshow("frame", frame)
 
 # - press key to select options
