@@ -181,13 +181,13 @@ while True:
         cv2.putText(result,"FPS: {}".format(fps), (int(width - width/4), 20), 0, 0.5, (255, 0, 0), 2)
 
 # - Show results
-    cv2.imshow("mask_image", masked_image)
-    cv2.imshow("result", result)
-    cv2.imshow("region_image", region_image)
+    # cv2.imshow("mask_image", masked_image)
+    # cv2.imshow("region_image", region_image)
     # cv2.imshow("canny_image", canny_image)
-    # cv2.imshow("mask_crop_light", crop_lights)
-    # cv2.imshow("mask_light", mask_light)
+    cv2.imshow("mask_crop_light", crop_lights)
+    cv2.imshow("mask_light", mask_light)
     # cv2.imshow("frame", frame)
+    cv2.imshow("result", result)
 
 # - press key to select options
     key = cv2.waitKey(1)

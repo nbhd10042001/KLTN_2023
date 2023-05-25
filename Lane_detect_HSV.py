@@ -39,7 +39,7 @@ def HSV_color_selection(image):
     
     #White color mask
     lower_threshold = np.uint8([0, 0, 150])
-    upper_threshold = np.uint8([255, 20, 255])
+    upper_threshold = np.uint8([170, 135, 255])
     white_mask = cv2.inRange(converted_image, lower_threshold, upper_threshold)
     
     #Yellow color mask
@@ -74,14 +74,14 @@ def HLS_color_selection(image):
 def region_selection(image):
     mask = np.zeros_like(image)   
     height, width = image.shape[:2]
-    point_1 = [width * 0.1, height * 0.9]
-    point_2 = [width * 0.4, height * 0.7]
-    point_3 = [width * 1, height * 0.9]
-    point_4 = [width * 0.7, height * 0.7]
-    polygon = np.array([[point_1, point_2, point_4, point_3]], dtype=np.int32)
+    point_1 = [width * 0.3, height * 0.88]
+    point_2 = [width * 0.5, height * 0.69]
+    point_3 = [width * 0.75, height * 0.69]
+    point_4 = [width * 0.9, height * 0.88]
+    polygon = np.array([[point_1, point_2, point_3, point_4]], dtype=np.int32)
     cv2.fillPoly(mask, polygon, 255)
     masked_image = cv2.bitwise_and(image, mask)
-    return masked_image
+    return masked_image, mask
 
 def draw_lines(image, lines, color = [255, 0, 0], thickness = 2):
     image = np.copy(image)
@@ -174,7 +174,7 @@ while(True):
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
 
 
-    frame = cv2.resize(frame, [int(640),int(480)])
+    frame = cv2.resize(frame, [int(640/2),int(480/2)])
     frame1 = cv2.convertScaleAbs(frame, alpha=0.6, beta=5)
     frame2 = cv2.convertScaleAbs(frame, alpha=1.4, beta=5)
     frame_RGB = RGB_color_selection(frame)
@@ -193,15 +193,15 @@ while(True):
     canny_HSV = cv2.Canny(blur_HSV, 50, 150)
     canny_HLS = cv2.Canny(blur_HLS, 50, 150)
 
-    region_RGB = region_selection(canny_RGB)
-    region_HSV = region_selection(canny_HSV)
-    region_HLS = region_selection(canny_HLS)
+    # region_RGB = region_selection(canny_RGB)
+    region_HSV, mask2 = region_selection(canny_HSV)
+    # region_HLS = region_selection(canny_HLS)
 
-    hough_lines_RGB = cv2.HoughLinesP(region_RGB, rho = 1, theta = (np.pi/180), threshold = 20,
-                           minLineLength = 20, maxLineGap = 300)
+    # hough_lines_RGB = cv2.HoughLinesP(region_RGB, rho = 1, theta = (np.pi/180), threshold = 20,
+    #                        minLineLength = 20, maxLineGap = 300)
+    # hough_lines_HLS = cv2.HoughLinesP(region_HLS, rho = 1, theta = (np.pi/180), threshold = 20,
+    #                         minLineLength = 20, maxLineGap = 300)
     hough_lines_HSV = cv2.HoughLinesP(region_HSV, rho = 1, theta = (np.pi/180), threshold = 20,
-                            minLineLength = 20, maxLineGap = 300)
-    hough_lines_HLS = cv2.HoughLinesP(region_HLS, rho = 1, theta = (np.pi/180), threshold = 20,
                             minLineLength = 20, maxLineGap = 300)
     
     # line_image = draw_lines(frame, hough_lines_HLS)
@@ -209,13 +209,22 @@ while(True):
     # lane_image = draw_lane_lines(frame, lane_lines(frame, hough_lines_HLS))
     
     # cv2.imshow('frame_RGB',frame_RGB)
-    # cv2.imshow('frame_HSV',frame_HSV)n
-    # cv2.imshow('frame_HSL',frame_HSL)
+    # cv2.imshow('frame_HSL',frame_HLS)
+    cv2.imshow('frame_HSV',frame_HSV)
+    cv2.imshow('wm',wm)
+    cv2.imshow('ym',ym)
+    cv2.imshow('mask1',mask1)
+
+    # cv2.imshow('region_image',mask2)
+    # cv2.imshow('region_HSV',region_HSV)
+    # cv2.imshow('canny_HSV',canny_HSV)
+    # cv2.imshow('gray_HSV',gray_HSV)
+    # cv2.imshow('blur_HSV',blur_HSV)
     # cv2.imshow('lane_image',lane_image)
 
-    cv2.imshow('frame',frame)
-    cv2.imshow('Low',frame1)
-    cv2.imshow('High',frame2)
+    # cv2.imshow('frame',frame)
+    # cv2.imshow('Low',frame1)
+    # cv2.imshow('High',frame2)
 
     key = cv2.waitKey(1)
     if key == ord('h'):

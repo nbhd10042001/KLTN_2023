@@ -56,10 +56,10 @@ class LightSignal_and_Warnings:
                     cv2.putText(frame,"Warning! Xe dung khan cap!", (10, 40), 0, 0.5, (0, 0, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 0, 255), 2)
                 if car.turnRight == True and car.turnLeft == False:
-                    cv2.putText(frame,"Warning! Xe re", (10, 60), 0, 0.5, (0, 255, 255), 2)
+                    cv2.putText(frame,"Warning! Xe re lan", (10, 60), 0, 0.5, (0, 255, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
                 if car.turnRight == False and car.turnLeft == True:
-                    cv2.putText(frame,"Warning! Xe re", (10, 60), 0, 0.5, (0, 255, 255), 2)
+                    cv2.putText(frame,"Warning! Xe re lan", (10, 60), 0, 0.5, (0, 255, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
         return frame
     
