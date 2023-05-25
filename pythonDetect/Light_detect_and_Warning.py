@@ -17,7 +17,7 @@ class LightSignal_and_Warnings:
     def create_mask_hsv(self, crop_lights):
         hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
         # find mask and threshold
-        lower = np.array([18, 20, 255], dtype="uint8")
+        lower = np.array([17, 20, 255], dtype="uint8")
         upper = np.array([50, 255, 255], dtype="uint8")
 
         mask = cv2.inRange(hsv, lower, upper)
@@ -42,16 +42,16 @@ class LightSignal_and_Warnings:
                     P_light = 2*(wl + hl)
                     if P_light > int(P_car*0.03):
                         # detect turn signal lights 
-                        if (cx <= xl_cent <= (cx + int((cw)/3))) and ((cy) <= yl_cent <= (cy + ch)):
+                        if (cx <= xl_cent <= (cx + int((cw)/2))) and ((cy) <= yl_cent <= (cy + ch)):
                             car.turnLeft = True
                             cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
                             cv2.putText(frame, "Left", (xl, yl), 0, 0.3, (0, 255, 255), 1)
 
-                        if ((cx + cw)- int((cw)/3)) <= xl_cent <= (cx + cw) and (cy) <= yl_cent <= (cy + ch):
+                        if ((cx + cw)- int((cw)/2)) <= xl_cent <= (cx + cw) and (cy) <= yl_cent <= (cy + ch):
                             car.turnRight = True
                             cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
                             cv2.putText(frame, "Right", (xl, yl), 0, 0.3, (0, 255, 255), 1)
-            if car.numberLight < 3:
+            if car.numberLight < 4:
                 if car.turnRight == True and car.turnLeft == True:
                     cv2.putText(frame,"Warning! Xe dung khan cap!", (10, 40), 0, 0.5, (0, 0, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 0, 255), 2)
@@ -69,7 +69,7 @@ class LightSignal_and_Warnings:
             x, y, w, h, cf = boxs[i]
             # add box to arr
             h_3 = int(h/3)
-            w_3 = int(w/3)
+            w_3 = int(w*0.4)
             # arr.append([(x, y + h2), (x + w_3, y + h2), (x + w_3, y+h), (x, y+h)])
             # arr.append([(x + w33, y + h2), (x + w, y + h2), (x + w, y+h), (x + w33, y+h)])
             arr.append([(x, y+h_3), (x + w_3, y+h_3), (x + w_3, y+h), (x, y+h)])

@@ -9,7 +9,7 @@ from pythonDetect.Lane_detect import LaneDetector
 # Load path
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
-# mp4 = pathVideo + "/lane/light2.mp4"
+# mp4 = pathVideo + "/lane/2light.mp4"
 mp4 = pathVideo + "/lane/ok6.mp4"
 # mp4 = pathVideo + "/lane4.mp4"
 
@@ -57,8 +57,8 @@ def changeScaleAbs(frame, text_ScaleAbs):
     upper = np.array([80, 255, 255], dtype="uint8")
     mask = cv2.inRange(hsv, lower, upper)
     brightness = np.average(mask)
-    # print(brightness)
-    if brightness > 90:
+    print(brightness)
+    if brightness > 140:
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
         text_ScaleAbs = "Low"
     if brightness < 2:
@@ -72,7 +72,7 @@ while True:
     if not ret:
         video = cv2.VideoCapture(0)
         continue
-    frame = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
+    frame = cv2.resize(frame, (640, 480))
     height, width = frame.shape[0], frame.shape[1]
     frame, text_ScaleAbs = changeScaleAbs(frame.copy(), text_ScaleAbs)
     

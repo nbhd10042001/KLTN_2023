@@ -5,7 +5,7 @@ import time
 # mp4 = "video/blink.mp4"
 # mp4 = "video/light_blink/blink5.mp4"
 # mp4 = "video/lane/ok6.mp4"
-mp4 = "video/lane/light2.mp4"
+mp4 = "video/lane/light4.mp4"
 video = cv2.VideoCapture(mp4)
 
 video.set(10, 0)
@@ -36,7 +36,7 @@ while True:
         if not ret:
             video = cv2.VideoCapture(mp4)
             continue
-        # frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=10)
+        # frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
         frame = cv2.resize(frame, [640, 480])
 
         # detect color lights
