@@ -104,11 +104,11 @@ class LaneDetector:
 
         for line in lines:
             for x1, y1, x2, y2 in line:
+                # slope = (y2 - y1) / (x2 - x1) # OverflowError: cannot convert float infinity to integer
+                # intercept = y1 - (slope * x1)
                 parameters = np.polyfit((x1, x2), (y1, y2), 1)
                 slope = parameters[0]
                 intercept = parameters[1]
-                # slope = (y2 - y1) / (x2 - x1)
-                # intercept = y1 - (slope * x1)
                 if slope < 0:
                     left_fit.append((slope, intercept))
                 else:

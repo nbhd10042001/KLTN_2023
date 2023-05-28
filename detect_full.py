@@ -57,7 +57,7 @@ def changeScaleAbs(frame, text_ScaleAbs):
     upper = np.array([80, 255, 255], dtype="uint8")
     mask = cv2.inRange(hsv, lower, upper)
     brightness = np.average(mask)
-    print(brightness)
+    # print(brightness)
     if brightness > 140:
         frame = cv2.convertScaleAbs(frame, alpha=0.8, beta=5)
         text_ScaleAbs = "Low"

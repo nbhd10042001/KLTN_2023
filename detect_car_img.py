@@ -9,7 +9,7 @@ import time
 vd = VehicleDetector_yolov5()
 
 # Load images from a folder
-images_folder = glob.glob("img/vehicle_lane/*.*") # muon tim cu the thi dung ("img/*.jpg")
+images_folder = glob.glob("img/speed_car/*.*") # muon tim cu the thi dung ("img/*.jpg")
 # print(images_folder)
 
 
