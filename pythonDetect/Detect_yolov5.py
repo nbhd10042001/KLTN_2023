@@ -37,7 +37,7 @@ class VehicleDetector_yolov5:
                         w = x2 - x1
                         h = y2 - y1
                         conf = confidence
-                        box = [x1, y1, w, h, conf]
+                        box = [x1, y1, w, h, conf, name]
                         vehicles_boxes.append(box)
 
                 for n in class_bike:
@@ -49,7 +49,7 @@ class VehicleDetector_yolov5:
                         w = x2 - x1
                         h = y2 - y1
                         conf = confidence
-                        box = [x1, y1, w, h, conf]
+                        box = [x1, y1, w, h, conf, name]
                         bike_boxes.append(box)
     
         return vehicles_boxes, bike_boxes

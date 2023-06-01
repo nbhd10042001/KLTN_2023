@@ -4,15 +4,18 @@ import numpy as np
 class LightSignal_and_Warnings:
 
     def lane_crossing_warning(self, frame, box, masked_image):
-        x, y, w, h, conf = box
-        cv2.putText(frame,"{:.2f}".format(conf), (x, y), 0, 0.5, (255, 255, 0), 1)
+        warning_cross = False
+        x, y, w, h, conf, name = box
+        # cv2.putText(frame,"{:.2f}".format(conf), (x, y+15), 0, 0.5, (255, 255, 0), 1)
         center = [int(x + w/2 -1), int(y + h -1)] #center box of vehicle (-1 de khong bi IndexError: index 480 is out of bounds for axis 0 with size 480)
         cv2.circle(masked_image, center, 5, 255, 2)
         b,g,r = masked_image[center[1], center[0]]
         if (b == 0 and g == 0 and r == 255):
-            cv2.putText(frame,"Warning! Co xe vuot lan", (10, 20), 0, 0.5, (0, 255, 255), 2)
+            cv2.putText(frame,"                                                         ", (10, 20), 0, 0.5, (0, 0, 0), 2)
+            cv2.putText(frame,"Warning! The {} crossing the lane".format(name), (10, 20), 0, 0.5, (0, 255, 255), 2)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
-        return frame, masked_image
+            warning_cross = True
+        return frame, masked_image, warning_cross
 
     def create_mask_hsv(self, crop_lights):
         hsv = cv2.cvtColor(crop_lights, cv2.COLOR_BGR2HSV)
@@ -28,6 +31,7 @@ class LightSignal_and_Warnings:
     
     def handle_lightSignal(self,frame, classCar, lightBoxs):
         for car in classCar:
+            warning_signal = False
             cx = car.x # x, y, w, h of car
             cy = car.y
             cw = car.w
@@ -51,25 +55,27 @@ class LightSignal_and_Warnings:
                             car.turnRight = True
                             cv2.rectangle(frame, (xl ,yl), (xl + wl, yl + hl), (0,255,255), 1)
                             cv2.putText(frame, "Right", (xl, yl), 0, 0.3, (0, 255, 255), 1)
+
             if car.numberLight < 4:
                 if car.turnRight == True and car.turnLeft == True:
-                    cv2.putText(frame,"Warning! Xe dung khan cap!", (10, 40), 0, 0.5, (0, 0, 255), 2)
+                    cv2.putText(frame,"                                                ", (10, 60), 0, 0.5, (0, 0, 255), 2)
+                    cv2.putText(frame,"Warning! The {} emergency stop!".format(car.name), (10, 60), 0, 0.5, (0, 0, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 0, 255), 2)
-                if car.turnRight == True and car.turnLeft == False:
-                    cv2.putText(frame,"Warning! Xe re lan", (10, 60), 0, 0.5, (0, 255, 255), 2)
+                if (car.turnRight == True and car.turnLeft == False 
+                    or car.turnRight == False and car.turnLeft == True):
+                    cv2.putText(frame,"                                                         ", (10, 40), 0, 0.5, (0, 255, 255), 2)
+                    cv2.putText(frame,"Warning! The {} wants to cross the lane!".format(car.name), (10, 40), 0, 0.5, (0, 255, 255), 2)
                     cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
-                if car.turnRight == False and car.turnLeft == True:
-                    cv2.putText(frame,"Warning! Xe re lan", (10, 60), 0, 0.5, (0, 255, 255), 2)
-                    cv2.rectangle(frame, (cx, cy), (cx + cw, cy + ch), (0, 255, 255), 2)
-        return frame
+                    warning_signal = True
+        return frame, warning_signal
     
     def crop_lights_vehicle(self, image, boxs):
         arr = []
         for i in range(len(boxs)):
-            x, y, w, h, cf = boxs[i]
+            x, y, w, h, _, _ = boxs[i]
             # add box to arr
             h_3 = int(h/3)
-            w_3 = int(w*0.4)
+            w_3 = int(w*0.45)
             # arr.append([(x, y + h2), (x + w_3, y + h2), (x + w_3, y+h), (x, y+h)])
             # arr.append([(x + w33, y + h2), (x + w, y + h2), (x + w, y+h), (x + w33, y+h)])
             arr.append([(x, y+h_3), (x + w_3, y+h_3), (x + w_3, y+h), (x, y+h)])

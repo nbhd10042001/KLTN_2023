@@ -9,9 +9,8 @@ from pythonDetect.Lane_detect import LaneDetector
 # Load path
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
-# mp4 = pathVideo + "/lane/2light.mp4"
-mp4 = pathVideo + "/lane/ok6.mp4"
-# mp4 = pathVideo + "/lane4.mp4"
+# mp4 = pathVideo + "/lane/light2.mp4"
+mp4 = pathVideo + "/lane/ok4.mp4"
 
 # Load file import
 vd = VehicleDetector_yolov5()
@@ -21,15 +20,19 @@ detect_light_warning = LightSignal_and_Warnings()
 # Load video
 video = cv2.VideoCapture(mp4)
 # video = cv2.VideoCapture(0)
+
+# initialize variables
 font = cv2.FONT_HERSHEY_COMPLEX
 text_ScaleAbs = "None"
 color_selection = 3
 color_selec_text = ""
 fps_count = 0
 fps = 0
+warning_signal = False
+warning_cross = False
 
 class Car():
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, name):
         self.x = x
         self.y = y
         self.w = w
@@ -37,11 +40,12 @@ class Car():
         self.turnRight = False
         self.turnLeft = False
         self.numberLight = 0
+        self.name = name
 
 def crop_vehicle(image, boxs):
     arr = []
     for box in boxs:
-        x, y, w, h, _ = box
+        x, y, w, h, _, _ = box
         # add box to arr
         arr.append([(x, y), (x+w, y), (x+w, y+h), (x, y+h)])
     polygons = np.array(arr)
@@ -107,7 +111,7 @@ while True:
 
     region_image = ld.region_of_interest(canny_image)
     lines = cv2.HoughLinesP(region_image, rho = 1, theta = (np.pi/180), threshold = 20,
-                           minLineLength = 20, maxLineGap = 300)
+                           minLineLength = 5, maxLineGap = 500)
     # print(len(lines))
     if lines is not None:
         averaged_lines = ld.average_slope_intercept(frame, lines)
@@ -141,18 +145,20 @@ while True:
 # - Detect car and lane crossing warning
     if vehicle_boxes:
         for box in vehicle_boxes:
-            x, y, w, h, conf = box
+            x, y, w, h, conf, name = box
             # find lag box 
             if w > int(width*0.05) and (w < int(h*2)) and (h < int(w*2)):
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0,255,0), 2)
+                cv2.putText(frame,name, (x, y), 0, 0.5, (0, 255, 0), 1)
+
+                # lane crossing warning
+                frame, masked_image, warning_cross = detect_light_warning.lane_crossing_warning(frame, box, masked_image)
                 vboxes_near.append(box)
-                car = Car(x, y, w, h)
+                car = Car(x, y, w, h, name)
                 classCar.append(car)
-            else: cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0,0), 2) # small box car   
-    if vboxes_near:
-        for box in vboxes_near:   
-            x, y, w, h, conf = box     
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0,255,0), 2)
-            frame, masked_image = detect_light_warning.lane_crossing_warning(frame, box, masked_image)
+            else: 
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0, 0), 2) # small box car 
+                cv2.putText(frame,name, (x, y), 0, 0.5, (255, 0, 0), 1)
 
 # - detect color lights
     crop_lights = detect_light_warning.crop_lights_vehicle(frame1, vboxes_near)
@@ -162,7 +168,11 @@ while True:
         for cnt in contours:
             xl, yl, wl, hl = cv2.boundingRect(cnt)
             lightBoxes.append([xl, yl, wl, hl])
-        frame = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
+        frame, warning_signal = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
+
+# - Result frame
+    # if warning_signal == False and warning_cross == False:
+    #     cv2.putText(frame,"You are Safe!", (10, 20), 0, 1, (0, 255, 0), 2)
 
     classCar = []
     if lines is not None:
@@ -181,11 +191,11 @@ while True:
         cv2.putText(result,"FPS: {}".format(fps), (int(width - width/4), 20), 0, 0.5, (255, 0, 0), 2)
 
 # - Show results
-    # cv2.imshow("mask_image", masked_image)
-    # cv2.imshow("region_image", region_image)
+    cv2.imshow("mask_image", masked_image)
+    cv2.imshow("region_image", region_image)
     # cv2.imshow("canny_image", canny_image)
-    cv2.imshow("mask_crop_light", crop_lights)
-    cv2.imshow("mask_light", mask_light)
+    # cv2.imshow("mask_crop_light", crop_lights)
+    # cv2.imshow("mask_light", mask_light)
     # cv2.imshow("frame", frame)
     cv2.imshow("result", result)
 
