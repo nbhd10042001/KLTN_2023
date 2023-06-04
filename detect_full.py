@@ -200,17 +200,17 @@ while True:
         start_warning = time.time()
 
     if active_warning_1 == True:
-        cv2.putText(frame,"Warning! The car wants to cross the lane!", (10, 70), 0, 0.5, (0, 255, 255), 2)
+        cv2.putText(frame,"Warning! Co xe xin vuot lan!", (10, 70), 0, 0.5, (0, 255, 255), 2)
         if (time.time() - start_warning_1) > 4:
             active_warning_1 = False
 
     if active_warning_2 == True:
-        cv2.putText(frame,"Warning! The car crossing the lane", (10, 50), 0, 0.5, (0, 255, 255), 2)
+        cv2.putText(frame,"Warning! Co xe vuot lan!", (10, 50), 0, 0.5, (0, 255, 255), 2)
         if (time.time() - start_warning_2) > 4:
             active_warning_2 = False
 
     if active_warning_3 == True:
-        cv2.putText(frame,"Warning! The car emergency stop!", (10, 90), 0, 0.5, (0, 0, 255), 2)
+        cv2.putText(frame,"Warning! Co xe dung khan cap!", (10, 90), 0, 0.5, (0, 0, 255), 2)
         if (time.time() - start_warning_3) > 4:
             active_warning_3 = False
 
@@ -218,7 +218,7 @@ while True:
         cv2.putText(frame,"WARNING!", (10, 30), 0, 1, (0, 255, 255), 3)
         if (time.time() - start_warning) > 4:
             active_warning = False
-    else: cv2.putText(frame,"You are Safe!", (10, 30), 0, 1, (0, 255, 0), 3)
+    else: cv2.putText(frame,"You are SAFE!", (10, 30), 0, 1, (0, 255, 0), 3)
 
 # - Result frame
     classCar = []
