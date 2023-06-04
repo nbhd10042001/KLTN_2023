@@ -31,6 +31,10 @@ fps = 0
 warning_signal = False
 warning_cross = False
 active_warning = False
+active_warning_1 = False
+active_warning_2 = False
+active_warning_3 = False
+Emergency = False
 
 class Car():
     def __init__(self, x, y, w, h, name):
@@ -42,8 +46,6 @@ class Car():
         self.turnLeft = False
         self.numberLight = 0
         self.name = name
-        self.warning_signal = False
-        self.warning_cross = False
 
 def crop_vehicle(image, boxs):
     arr = []
@@ -173,21 +175,50 @@ while True:
         for cnt in contours:
             xl, yl, wl, hl = cv2.boundingRect(cnt)
             lightBoxes.append([xl, yl, wl, hl])
-        frame, warning_signal = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
+        frame, warning_signal, Emergency = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
 # - active warning 4 seconds
-    if warning_signal == True or (True in box_warning):
+    if warning_signal == True:
         warning_signal = False
-        box_warning = []
+        active_warning_1 = True
         active_warning = True
+        start_warning_1 = time.time()
         start_warning = time.time()
+
+    if True in box_warning:
+        box_warning = []
+        active_warning_2 = True
+        active_warning = True
+        start_warning_2 = time.time()
+        start_warning = time.time()
+
+    if Emergency == True:
+        Emergency = False
+        active_warning_3 = True
+        active_warning = True
+        start_warning_3 = time.time()
+        start_warning = time.time()
+
+    if active_warning_1 == True:
+        cv2.putText(frame,"Warning! The car wants to cross the lane!", (10, 70), 0, 0.5, (0, 255, 255), 2)
+        if (time.time() - start_warning_1) > 4:
+            active_warning_1 = False
+
+    if active_warning_2 == True:
+        cv2.putText(frame,"Warning! The car crossing the lane", (10, 50), 0, 0.5, (0, 255, 255), 2)
+        if (time.time() - start_warning_2) > 4:
+            active_warning_2 = False
+
+    if active_warning_3 == True:
+        cv2.putText(frame,"Warning! The car emergency stop!", (10, 90), 0, 0.5, (0, 0, 255), 2)
+        if (time.time() - start_warning_3) > 4:
+            active_warning_3 = False
 
     if active_warning == True:
         cv2.putText(frame,"WARNING!", (10, 30), 0, 1, (0, 255, 255), 3)
         if (time.time() - start_warning) > 4:
             active_warning = False
-    else:
-        cv2.putText(frame,"You are Safe!", (10, 30), 0, 1, (0, 255, 0), 3)
+    else: cv2.putText(frame,"You are Safe!", (10, 30), 0, 1, (0, 255, 0), 3)
 
 # - Result frame
     classCar = []
