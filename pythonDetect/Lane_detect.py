@@ -137,7 +137,7 @@ class LaneDetector:
             if len(arr) == 4:
                 temp = arr[2]; arr[2] = arr[3]; arr[3] = temp # doi vi tri cac diem da giac
                 p1 = arr[0]; p2 = arr[1]; p3 = arr[2]; p4 = arr[3]
-                if ((p2[0] < p3[0] - int(w*0.05)) 
+                if ((p2[0] < (p3[0] - int(w*0.1)))
                     and (p2[0] - p1[0] < int(w*0.5)) 
                     and (p4[0] - p3[0] < int(w*0.5))):
                     if (int(w*0.4) < p3[0] < int(w*0.8)) and  (int(w*0.2) < p2[0] < int(w*0.6)):

@@ -10,7 +10,7 @@ from pythonDetect.Lane_detect import LaneDetector
 pathFile = os.path.dirname(__file__)
 pathVideo = os.path.join(pathFile, 'video')
 # mp4 = pathVideo + "/lane/light2.mp4"
-mp4 = pathVideo + "/lane/ok4.mp4"
+mp4 = pathVideo + "/lane/ok6.mp4"
 
 # Load file import
 vd = VehicleDetector_yolov5()
@@ -30,6 +30,7 @@ fps_count = 0
 fps = 0
 warning_signal = False
 warning_cross = False
+active_warning = False
 
 class Car():
     def __init__(self, x, y, w, h, name):
@@ -41,6 +42,8 @@ class Car():
         self.turnLeft = False
         self.numberLight = 0
         self.name = name
+        self.warning_signal = False
+        self.warning_cross = False
 
 def crop_vehicle(image, boxs):
     arr = []
@@ -100,6 +103,7 @@ while True:
     vboxes_near = []
     classCar = []
     lightBoxes = []
+    box_warning = []
     mask = np.zeros_like(frame)
     masked_image = cv2.bitwise_and(frame, mask)
 
@@ -153,6 +157,7 @@ while True:
 
                 # lane crossing warning
                 frame, masked_image, warning_cross = detect_light_warning.lane_crossing_warning(frame, box, masked_image)
+                box_warning.append(warning_cross)
                 vboxes_near.append(box)
                 car = Car(x, y, w, h, name)
                 classCar.append(car)
@@ -170,10 +175,21 @@ while True:
             lightBoxes.append([xl, yl, wl, hl])
         frame, warning_signal = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
-# - Result frame
-    # if warning_signal == False and warning_cross == False:
-    #     cv2.putText(frame,"You are Safe!", (10, 20), 0, 1, (0, 255, 0), 2)
+# - active warning 4 seconds
+    if warning_signal == True or (True in box_warning):
+        warning_signal = False
+        box_warning = []
+        active_warning = True
+        start_warning = time.time()
 
+    if active_warning == True:
+        cv2.putText(frame,"WARNING!", (10, 30), 0, 1, (0, 255, 255), 3)
+        if (time.time() - start_warning) > 4:
+            active_warning = False
+    else:
+        cv2.putText(frame,"You are Safe!", (10, 30), 0, 1, (0, 255, 0), 3)
+
+# - Result frame
     classCar = []
     if lines is not None:
         result = cv2.addWeighted(frame, 1, line_image, 0.3, 1)
