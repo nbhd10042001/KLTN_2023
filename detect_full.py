@@ -177,7 +177,7 @@ while True:
             lightBoxes.append([xl, yl, wl, hl])
         frame, warning_signal, Emergency = detect_light_warning.handle_lightSignal(frame, classCar, lightBoxes)
 
-# - active warning 4 seconds
+# - active warning after detect
     if warning_signal == True:
         warning_signal = False
         active_warning_1 = True
@@ -201,22 +201,22 @@ while True:
 
     if active_warning_1 == True:
         cv2.putText(frame,"Warning! Co xe xin vuot lan!", (10, 70), 0, 0.5, (0, 255, 255), 2)
-        if (time.time() - start_warning_1) > 4:
+        if (time.time() - start_warning_1) >= 3:
             active_warning_1 = False
 
     if active_warning_2 == True:
         cv2.putText(frame,"Warning! Co xe vuot lan!", (10, 50), 0, 0.5, (0, 255, 255), 2)
-        if (time.time() - start_warning_2) > 4:
+        if (time.time() - start_warning_2) >= 3:
             active_warning_2 = False
 
     if active_warning_3 == True:
         cv2.putText(frame,"Warning! Co xe dung khan cap!", (10, 90), 0, 0.5, (0, 0, 255), 2)
-        if (time.time() - start_warning_3) > 4:
+        if (time.time() - start_warning_3) >= 3:
             active_warning_3 = False
 
     if active_warning == True:
         cv2.putText(frame,"WARNING!", (10, 30), 0, 1, (0, 255, 255), 3)
-        if (time.time() - start_warning) > 4:
+        if (time.time() - start_warning) >= 3:
             active_warning = False
     else: cv2.putText(frame,"You are SAFE!", (10, 30), 0, 1, (0, 255, 0), 3)
 
